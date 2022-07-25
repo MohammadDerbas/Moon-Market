@@ -23,4 +23,6 @@ public interface FollowRepo extends JpaRepository<Followers,Long> {
     @Modifying
     @Query("delete from Followers f where f.id = ?1")
     void deleteById(FollowersId followersId);
+    @Query("SELECT (count(c)>0) from Followers c where c.customer.id=?1 and c.seller.id=?2")
+    Boolean isCustmoerFollowSeller(Long id,Long id2);
 }

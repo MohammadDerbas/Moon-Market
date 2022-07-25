@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.DTO.RegistrationRequest;
 import com.example.demo.entity.*;
+import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.MemberShipRepo;
 import com.example.demo.repo.RoleRepo;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class RegistrationServices {
     public String rigister(RegistrationRequest request) throws MessagingException {
        boolean isValidEmail = emailValidator.test(request.getEmail());
         if(!isValidEmail){
-        throw new IllegalStateException("email not valid");
+        throw new ApiRequestException("email not valid");
         }
         if(request.getCustomer()) {
             Role role=roleRepo.findByName("CUSTOMER");
@@ -90,13 +91,13 @@ public class RegistrationServices {
         ConfirmationToken confirmationToken=confirmationTokenService
                 .getToken(token)
                 .orElseThrow(()->
-                        new IllegalStateException("token not found"));
+                        new ApiRequestException("token not found"));
             if(confirmationToken.getConfirmedAt()!=null){
-                throw new IllegalStateException("email already confirmed");
+                throw new ApiRequestException("email already confirmed");
             }
         LocalDateTime expiresAt = confirmationToken.getExpiresAt();
         if(expiresAt.isBefore(LocalDateTime.now())){
-            throw new IllegalStateException("token expired");
+            throw new ApiRequestException("token expired");
         }
         confirmationTokenService.setConfirmedAt(token);
         userServices.enableUser(

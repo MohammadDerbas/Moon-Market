@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.DTO.UserDTO;
 import com.example.demo.entity.*;
+import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.RoleRepo;
 import com.example.demo.repo.UserRepo;
 import com.example.demo.security.PasswordEncoder;
@@ -64,7 +65,7 @@ public class UserServices implements UserDetailsService {
             // TODO check of attributes are the same and
             // TODO if email not confirmed send confirmation email.
 
-            throw new IllegalStateException("email already taken");
+            throw new ApiRequestException("email already taken");
         }
         PasswordEncoder passwordEncoder=new PasswordEncoder();
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(customer.getPassword());
@@ -89,7 +90,7 @@ public class UserServices implements UserDetailsService {
             // TODO check of attributes are the same and
             // TODO if email not confirmed send confirmation email.
 
-            throw new IllegalStateException("email already taken");
+            throw new ApiRequestException("email already taken");
         }
         PasswordEncoder passwordEncoder=new PasswordEncoder();
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(seller.getPassword());

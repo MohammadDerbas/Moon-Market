@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entity.EmailSender;
+import com.example.demo.exception.ApiRequestException;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -35,7 +36,7 @@ public class EmailService implements EmailSender {
         }
         catch (MessagingException e){
             logger.error("failed to send email",e);
-            throw new IllegalStateException("failed to send email");
+            throw new ApiRequestException("failed to send email");
         }
 
     }

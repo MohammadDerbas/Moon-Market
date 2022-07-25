@@ -19,6 +19,7 @@ public class FollowServices {
     }
 
     public List<Seller> showfollwing(Long id) {
+
         return followRepo.findSellerByCustomerId(id);
     }
 

@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DTO.CommentFromDto;
 import com.example.demo.entity.*;
+import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,7 +40,7 @@ public class CustomerServices {
     public Optional<Customer> getInfoCustomer(Long id) {
         boolean exists = customerRepo.existsById(id);
         if (!exists) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         Optional<Customer> customer = customerRepo.findUserByID(id);
         return customer;
@@ -48,7 +49,7 @@ public class CustomerServices {
     public void updateCustomerInfo(Long id,  String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
         boolean exists = userRepo.existsById(id);
         if (!exists) {
-            throw new IllegalStateException("Customer with id " + id + "does not exist");
+            throw new ApiRequestException("Customer with id " + id + "does not exist");
         }
         User customer = userRepo.getReferenceById(id);
 
@@ -57,7 +58,7 @@ public class CustomerServices {
         if (email != null && email.length() > 0 && !Objects.equals(customer.getEmail(), email)) {
             Optional<User> studentOptional = userRepo.findUserByEmail(email);
             if (studentOptional.isPresent()) {
-                throw new IllegalStateException("email taken");
+                throw new ApiRequestException("email taken");
             }
             customer.setEmail(email);
         }
@@ -94,11 +95,11 @@ public class CustomerServices {
     public void orderProduct(Long id, Long id2) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = productRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("product with id" + id2 + "does not exist");
+            throw new ApiRequestException("product with id" + id2 + "does not exist");
         }
         Optional<Customer> customer=customerRepo.findUserByID(id);
         Product product=productRepo.findProductById(id2);
@@ -110,11 +111,16 @@ public class CustomerServices {
     public void followSeller(Long id, Long id2) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = sellerRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+            throw new ApiRequestException("seller with id" + id2 + "does not exist");
+        }
+        Boolean exist2=followRepo.isCustmoerFollowSeller(id,id2);
+        if(exist2){
+            throw new ApiRequestException("customer with id" + id + " is following seller with id "+id2);
+
         }
         Optional<Customer> customer=customerRepo.findUserByID(id);
         Optional<Seller> seller=sellerRepo.findUserById(id2);
@@ -128,7 +134,7 @@ public class CustomerServices {
     public List showOrders(Long id) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         return orderRepo.findAlLProductByCustomer_Id(id);
     }
@@ -136,11 +142,11 @@ public class CustomerServices {
     public void deleteOrder(Long id, Long id2) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = productRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("product with id" + id2 + "does not exist");
+            throw new ApiRequestException("product with id" + id2 + "does not exist");
         }
         OrderId orderId=new OrderId(id,id2);
         orderRepo.deleteById(orderId);
@@ -149,11 +155,16 @@ public class CustomerServices {
     public void removeFollow(Long id, Long id2) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = sellerRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+            throw new ApiRequestException("seller with id" + id2 + "does not exist");
+        }
+        Boolean exist2=followRepo.isCustmoerFollowSeller(id,id2);
+        if(!exist2){
+            throw new ApiRequestException("customer with id" + id + " does not follow seller with id "+id2);
+
         }
         FollowersId followersId =new FollowersId(id,id2);
         followRepo.deleteById(followersId);
@@ -162,11 +173,11 @@ public class CustomerServices {
     public void commentSeller(Long id, Long id2, CommentDTO comment) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = sellerRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+            throw new ApiRequestException("seller with id" + id2 + "does not exist");
         }
         Optional<Customer> customer=customerRepo.findUserByID(id);
         Optional<Seller> seller=sellerRepo.findUserById(id2);
@@ -179,11 +190,11 @@ public class CustomerServices {
     public void commentProduct(Long id, Long id2, CommentDTO comment) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("customer with id" + id + "does not exist");
+            throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         boolean exist1 = productRepo.existsById(id2);
         if (!exist1) {
-            throw new IllegalStateException("product with id" + id2 + "does not exist");
+            throw new ApiRequestException("product with id" + id2 + "does not exist");
         }
         Optional<Customer> customer=customerRepo.findUserByID(id);
         Product product=productRepo.findProductById(id2);
@@ -197,7 +208,7 @@ public class CustomerServices {
     public List showProductComment(Long id){
         boolean exist = productRepo.existsById(id);
         if (!exist) {
-            throw new IllegalStateException("product with id" + id + "does not exist");
+            throw new ApiRequestException("product with id" + id + "does not exist");
         }
         return  productCommentRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
 
@@ -218,7 +229,7 @@ public class CustomerServices {
     public List showCustomerFollowing(Long id) {
             boolean exist = customerRepo.existsById(id);
             if (!exist) {
-                throw new IllegalStateException("customer with id" + id + "does not exist");
+                throw new ApiRequestException("customer with id" + id + "does not exist");
             }
         return followRepo.findSellerByCustomerId(id);
     }

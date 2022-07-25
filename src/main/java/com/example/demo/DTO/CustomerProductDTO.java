@@ -5,7 +5,6 @@ import com.example.demo.entity.Size;
 
 public class CustomerProductDTO {
 private Long userId;
-private String userName;
 private String firstName;
 private String lastName;
 private String address;
@@ -20,9 +19,8 @@ private Size size;
     public CustomerProductDTO() {
     }
 
-    public CustomerProductDTO(Long userId, String userName, String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, Size size) {
+    public CustomerProductDTO(Long userId,  String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, Size size) {
         this.userId = userId;
-        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -42,13 +40,7 @@ private Size size;
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
-    }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
 
     public String getFirstName() {
         return firstName;

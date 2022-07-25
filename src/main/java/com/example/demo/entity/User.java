@@ -3,18 +3,23 @@ package com.example.demo.entity;
 
 
 import com.example.demo.view.View;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import javax.persistence.*;
+import java.util.*;
 
 @Entity(name="User")
-@Table(name="market_user" , uniqueConstraints = {
-        @UniqueConstraint(name="user_username_unique",columnNames = "user_name"),
+@Table(name="market_user", uniqueConstraints = {
         @UniqueConstraint(name="user_email_unique",columnNames = "email")
 })
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public class User implements UserDetails {
 
 
     @Id
@@ -25,12 +30,7 @@ public abstract class User {
 
 
     private Long id;
-    @Column(
-            name="user_name",
-            nullable = false
-    )
-    @JsonView({View.View1.class, View.View3.class})
-    private String userName;
+
     @Column(
             name="first_name",
             nullable = false
@@ -57,7 +57,7 @@ public abstract class User {
             nullable = false
 
     )
-    @JsonView({View.View1.class, View.View3.class})
+    // @JsonView({View.View1.class, View.View3.class})
 
     private String password;
     @Column(
@@ -86,22 +86,29 @@ public abstract class User {
 
     private String postalCode;
 
-    @ManyToOne
-    @JoinColumn(
-            name="role_id",
-            referencedColumnName = "role_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name="user_role_id_fk")
-    )
-    @JsonIgnore
-    private Role role;
 
+    private Boolean locked = false;
+    private Boolean enabled = false;
+    @ManyToMany(
+            fetch = FetchType.EAGER
+    )
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "roleId"))
+    private Collection<Role> roles;
 
     public User() {
     }
 
-    public User(String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
-        this.userName = userName;
+
+    public User(Collection<Role> roles) {
+        this.roles = roles;
+    }
+
+    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -109,6 +116,55 @@ public abstract class User {
         this.address = address;
         this.phone = phone;
         this.postalCode = postalCode;
+        this.roles=roles;
+
+
+    }
+    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles,Boolean enabled) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.phone = phone;
+        this.postalCode = postalCode;
+        this.roles=roles;
+        this.enabled=enabled;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     public Long getId() {
@@ -119,12 +175,20 @@ public abstract class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
     }
 
     public String getFirstName() {
@@ -149,6 +213,11 @@ public abstract class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
     public String getPassword() {
@@ -183,13 +252,7 @@ public abstract class User {
         this.postalCode = postalCode;
     }
 
-    public Role getRole() {
-        return role;
-    }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
     public void addSellerComment(SellerComment sellerComment){
 
     }
@@ -210,18 +273,21 @@ public abstract class User {
     }
 
 
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", userName='" + userName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", address='" + address + '\'' +
+                    ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", postalCode='" + postalCode + '\'' +
                 '}';
     }
-}
+
+
+    }
+

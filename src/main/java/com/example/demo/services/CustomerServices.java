@@ -1,33 +1,39 @@
 package com.example.demo.services;
 
+import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.CommentFromDto;
 import com.example.demo.entity.*;
-import com.example.demo.repo.CustomerRepo;
-import com.example.demo.repo.OrderRepo;
-import com.example.demo.repo.ProductRepo;
-import com.example.demo.repo.UserRepo;
+import com.example.demo.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServices {
     private final CustomerRepo customerRepo;
+    private final SellerRepo sellerRepo;
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
     private final OrderRepo orderRepo;
+    private final FollowRepo followRepo;
+    private final SellerCommentRepo sellerCommentRepo;
+    private final ProductCommentRepo productCommentRepo;
 
     @Autowired
-    public CustomerServices(CustomerRepo customerRepo, @Qualifier("customerRepo") UserRepo userRepo, ProductRepo productRepo, OrderRepo orderRepo) {
+    public CustomerServices(CustomerRepo customerRepo, SellerRepo sellerRepo, @Qualifier("customerRepo") UserRepo userRepo, ProductRepo productRepo, OrderRepo orderRepo, FollowRepo followRepo, SellerCommentRepo sellerCommentRepo, ProductCommentRepo productCommentRepo) {
         this.customerRepo = customerRepo;
+        this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
         this.orderRepo = orderRepo;
+        this.followRepo = followRepo;
+        this.sellerCommentRepo = sellerCommentRepo;
+        this.productCommentRepo = productCommentRepo;
     }
 
     public Optional<Customer> getInfoCustomer(Long id) {
@@ -39,21 +45,15 @@ public class CustomerServices {
         return customer;
     }
 
-    public void updateCustomerInfo(Long id, String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
+    public void updateCustomerInfo(Long id,  String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
         boolean exists = userRepo.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Customer with id " + id + "does not exist");
         }
         User customer = userRepo.getReferenceById(id);
-        if (userName != null && userName.length() > 0 && !Objects.equals(customer.getUserName(), userName)) {
-            Optional<User> optionalCustomer = userRepo.findUserByUserName(userName);
-            if (optionalCustomer.isPresent()) {
-                throw new IllegalStateException("userName taken");
 
-            }
-            customer.setUserName(userName);
 
-        }
+
         if (email != null && email.length() > 0 && !Objects.equals(customer.getEmail(), email)) {
             Optional<User> studentOptional = userRepo.findUserByEmail(email);
             if (studentOptional.isPresent()) {
@@ -107,6 +107,23 @@ public class CustomerServices {
         orderRepo.save(order);
 
     }
+    public void followSeller(Long id, Long id2) {
+        boolean exist = customerRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("customer with id" + id + "does not exist");
+        }
+        boolean exist1 = sellerRepo.existsById(id2);
+        if (!exist1) {
+            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+        }
+        Optional<Customer> customer=customerRepo.findUserByID(id);
+        Optional<Seller> seller=sellerRepo.findUserById(id2);
+
+
+        Followers follow=new Followers(new FollowersId(id,id2),customer.get(),seller.get());
+        followRepo.save(follow);
+
+    }
 
     public List showOrders(Long id) {
         boolean exist = customerRepo.existsById(id);
@@ -127,5 +144,82 @@ public class CustomerServices {
         }
         OrderId orderId=new OrderId(id,id2);
         orderRepo.deleteById(orderId);
+    }
+
+    public void removeFollow(Long id, Long id2) {
+        boolean exist = customerRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("customer with id" + id + "does not exist");
+        }
+        boolean exist1 = sellerRepo.existsById(id2);
+        if (!exist1) {
+            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+        }
+        FollowersId followersId =new FollowersId(id,id2);
+        followRepo.deleteById(followersId);
+    }
+
+    public void commentSeller(Long id, Long id2, CommentDTO comment) {
+        boolean exist = customerRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("customer with id" + id + "does not exist");
+        }
+        boolean exist1 = sellerRepo.existsById(id2);
+        if (!exist1) {
+            throw new IllegalStateException("seller with id" + id2 + "does not exist");
+        }
+        Optional<Customer> customer=customerRepo.findUserByID(id);
+        Optional<Seller> seller=sellerRepo.findUserById(id2);
+        String sellerComments=comment.getComment();
+        SellerComment sellerComment=new SellerComment(sellerComments);
+        sellerComment.setSeller(seller.get());
+        sellerComment.setCustomer(customer.get());
+        sellerCommentRepo.save(sellerComment);
+    }
+    public void commentProduct(Long id, Long id2, CommentDTO comment) {
+        boolean exist = customerRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("customer with id" + id + "does not exist");
+        }
+        boolean exist1 = productRepo.existsById(id2);
+        if (!exist1) {
+            throw new IllegalStateException("product with id" + id2 + "does not exist");
+        }
+        Optional<Customer> customer=customerRepo.findUserByID(id);
+        Product product=productRepo.findProductById(id2);
+        String productComments=comment.getComment();
+        ProductComment productComment=new ProductComment(productComments);
+        productComment.setCustomer(customer.get());
+        productComment.setProduct(product);
+        productCommentRepo.save(productComment);
+    }
+
+    public List showProductComment(Long id){
+        boolean exist = productRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("product with id" + id + "does not exist");
+        }
+        return  productCommentRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+
+
+    }
+
+
+
+
+    private CommentFromDto convertToDTO(ProductComment productComment){
+        CommentFromDto dto=new CommentFromDto();
+        dto.setComment(productComment.getComment());
+        dto.setFrom(productComment.getCustomer().getFirstName()+" "+productComment.getCustomer().getLastName());
+        return dto;
+    }
+
+
+    public List showCustomerFollowing(Long id) {
+            boolean exist = customerRepo.existsById(id);
+            if (!exist) {
+                throw new IllegalStateException("customer with id" + id + "does not exist");
+            }
+        return followRepo.findSellerByCustomerId(id);
     }
 }

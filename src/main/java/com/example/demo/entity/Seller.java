@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity(name="Seller")
@@ -48,11 +49,11 @@ public class Seller extends User{
     )
     private List <StoreHouse> storeHouses=new ArrayList<>();
 
-    public Seller() {
-    }
 
-    public Seller(String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
-        super(userName, firstName, lastName, email, password, address, phone, postalCode);
+    public Seller() {}
+
+    public Seller(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
+        super( firstName, lastName, email, password, address, phone, postalCode,roles);
         this.reportCounter = 0;
         this.star = 0;
         this.activate = true;

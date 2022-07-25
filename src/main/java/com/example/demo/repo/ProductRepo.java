@@ -14,4 +14,8 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
     List<Product> showProductWithSpecificSeller( long id);
     @Query("select p from Product p where p.id = ?1")
     Product findProductById(long id);
+    @Query("select (count(u) > 0) from Product u where u.id = ?1")
+    @Override
+    boolean existsById(Long aLong);
+
 }

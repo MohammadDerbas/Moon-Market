@@ -6,17 +6,16 @@ import java.time.LocalDateTime;
 @Entity(name="ProductComment")
 @Table(name="product_comment")
 public class ProductComment {
-    @EmbeddedId
-    private ProductCommentId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @ManyToOne
-    @MapsId("customerId")
     @JoinColumn(
             name="customer_id",
             foreignKey = @ForeignKey(name="customer_id_fk")
     )
     private Customer customer;
     @ManyToOne
-    @MapsId("productId")
     @JoinColumn(
             name="product_id",
             foreignKey = @ForeignKey(name="product_id_fk")
@@ -33,26 +32,17 @@ public class ProductComment {
     public ProductComment() {
     }
 
-    public ProductComment(ProductCommentId id, Customer customer, Product product,String comment) {
-        this.id = id;
-        this.customer = customer;
-        this.product = product;
+    public ProductComment(String comment) {
+
         this.time = LocalDateTime.now();
         this.comment=comment;
     }
 
-    public ProductComment(Customer customer, Product product,String comment) {
-        this.customer = customer;
-        this.product = product;
-        this.time = LocalDateTime.now();
-        this.comment=comment;
-    }
-
-    public ProductCommentId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(ProductCommentId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

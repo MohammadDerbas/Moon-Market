@@ -1,120 +1,76 @@
 package com.example.demo.entity;
 
+import com.example.demo.entity.Privilege;
+import com.example.demo.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-@Entity(name="Role")
-@Table(name="role")
+@Entity()
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(
-            name="role_id",
-            updatable = false
-    )
     private Long roleId;
-    @Column(
-            name="role",
-            nullable = false
-    )
-    private String role;
-    @ManyToMany(
-            cascade ={ CascadeType.PERSIST,CascadeType.REMOVE}
-    )
-    @JoinTable (
-            name="role_authority",
-            joinColumns= @JoinColumn(
-                    name="role_id",
-                    foreignKey = @ForeignKey(name = "roleauthority_role_id_fk")
 
-    ),
-            inverseJoinColumns = @JoinColumn(
-                    name="authority_id",
-                    foreignKey = @ForeignKey(name = "roleauthority_authority_id_fk")
-    )
-    )
-    private List <Authority>authorities=new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "role",
-            cascade = {CascadeType.PERSIST,CascadeType.REMOVE}
-
-        )
+    private String name;
+    @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private List <User> users=new ArrayList<>();
+    private Collection<User> users;
+
+    @ManyToMany(
+            fetch = FetchType.EAGER
+    )
+    @JoinTable(
+            name = "roles_privileges",
+            joinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "roleId"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "privilege_id", referencedColumnName = "privilegeId"))
+    @JsonIgnore
+    private Collection<Privilege> privileges;
+
     public Role() {
     }
 
-    public Role(String role) {
-        this.role = role;
+    public Role(String name) {
+        this.name = name;
     }
 
-    public Long getRoleId() {
-        return roleId;
+
+
+
+    public String getName() {
+        return name;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public List<Authority> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(List<Authority> authorities) {
-        this.authorities = authorities;
-    }
-
-    public List<User> getUsers() {
+    public Collection<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(Collection<User> users) {
         this.users = users;
     }
 
-    public void addAuthority(Authority authority) {
-        if (!authorities.contains(authority)) {
-            authorities.add(authority);
-            authority.getRoles().add(this);
-        }
+    public Collection<Privilege> getPrivileges() {
+        return privileges;
     }
-        public void removeAuthority(Authority authority){
-            if(authorities.contains(authority)){
-                authorities.remove(authority);
-                authority.getRoles().remove(this);
-            }
 
-    }
-    public void addUser(User user){
-        if(!users.contains(user)){
-            users.add(user);
-            user.setRole(this);
-        }
-    }
-    public void removeUser(User user){
-        if(users.contains(user)){
-            users.remove(user);
-            user.setRole(null);
-        }
+    public void setPrivileges(Collection<Privilege> privileges) {
+        this.privileges = privileges;
     }
 
     @Override
     public String toString() {
         return "Role{" +
                 "roleId=" + roleId +
-                ", role='" + role + '\'' +
+                ", name='" + name + '\'' +
+                ", privileges=" + privileges +
                 '}';
     }
 }

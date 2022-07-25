@@ -1,10 +1,16 @@
 package com.example.demo.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Collection;
 
-@Entity(name="Admin")
+@Entity(name = "Admin")
+@Table(name="admin")
 public class Admin extends User{
-    public Admin(String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
-        super(userName, firstName, lastName, email, password, address, phone, postalCode);
+    public Admin() {
+    }
+
+    public Admin(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
+        super(firstName, lastName, email, password, address, phone, postalCode, roles);
     }
 }

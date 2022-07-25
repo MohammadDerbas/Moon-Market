@@ -1,14 +1,13 @@
 package com.example.demo.entity;
 
-import com.example.demo.repo.FollowersRepo;
 import com.example.demo.view.View;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity(name="Customer")
@@ -84,21 +83,25 @@ public class Customer extends User  {
            mappedBy = "customer"
    )
     private List <ProductComment> productComments =new ArrayList<>();
-   @OneToMany(
-           mappedBy = "customer"
-   )
-   private List <SellerComment> sellerComments =new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "customer"
+    )
+    @JsonIgnore
+    private List <SellerComment> sellerComments=new ArrayList<>();
     public Customer() {
     }
 
-    public Customer(String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
-        super(userName, firstName, lastName, email, password, address, phone, postalCode);
+    public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
+        super( firstName, lastName, email, password, address, phone, postalCode,roles);
         this.activate = true;
         this.points = 0;
         this.reportCounter = 0;
         this.customerPurchases = 0;
+
     }
+
+
 
     public Long getId() {
         return id;
@@ -207,13 +210,13 @@ public class Customer extends User  {
             productComments.remove(productComment);
 
     }
-    public void addSellerComment(SellerComment sellerComment){
+  /*  public void addSellerComment(SellerComment sellerComment){
         sellerComments.add(sellerComment);
     }
     public void removeSellerComment(SellerComment sellerComment){
         sellerComments.remove(sellerComment);
 
-    }
+    }*/
 
 
 

@@ -5,6 +5,7 @@ import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,6 @@ public interface SellerRepo extends UserRepo{
     @Query("select u from Seller u")
     @Override
     List<User> findAll();
+ @Query("select u.id from Seller u where u.email=?1")
+  Long findIdByEmail(String email);
 }

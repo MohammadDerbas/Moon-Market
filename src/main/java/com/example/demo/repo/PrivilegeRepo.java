@@ -1,9 +1,9 @@
 package com.example.demo.repo;
 
-import com.example.demo.entity.Followers;
+import com.example.demo.entity.Privilege;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FollowersRepo extends JpaRepository<Followers,Long> {
+public interface PrivilegeRepo extends JpaRepository<Privilege,Long> {
 }

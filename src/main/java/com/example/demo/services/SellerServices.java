@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.CommentFromDto;
 import com.example.demo.entity.*;
 import com.example.demo.repo.*;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SellerServices {
@@ -21,9 +24,11 @@ public class SellerServices {
     private final TypeRepo typeRepo;
     private final CategoryRepo categoryRepo;
     private final SizeRepo sizeRepo;
+    private final SellerCommentRepo sellerCommentRepo;
+    private final FollowRepo followRepo;
 
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -32,6 +37,8 @@ public class SellerServices {
         this.typeRepo = typeRepo;
         this.categoryRepo = categoryRepo;
         this.sizeRepo = sizeRepo;
+        this.sellerCommentRepo = sellerCommentRepo;
+        this.followRepo = followRepo;
     }
 
     public Product getInfoSellerProductWithId(Long id, Long id2) {
@@ -58,21 +65,13 @@ public class SellerServices {
 
     }
 
-    public void updateSellerInfo(Long id, String userName, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
+    public void updateSellerInfo(Long id,  String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
         boolean exists = userRepo.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Seller with id " + id + "does not exist");
         }
         User seller = userRepo.getReferenceById(id);
-        if (userName != null && userName.length() > 0 && !Objects.equals(seller.getUserName(), userName)) {
-            Optional<User> optionalSeller = userRepo.findUserByUserName(userName);
-            if (optionalSeller.isPresent()) {
-                throw new IllegalStateException("userName taken");
 
-            }
-            seller.setUserName(userName);
-
-        }
         if (email != null && email.length() > 0 && !Objects.equals(seller.getEmail(), email)) {
             Optional<User> studentOptional = userRepo.findUserByEmail(email);
             if (studentOptional.isPresent()) {
@@ -235,5 +234,36 @@ public class SellerServices {
             throw new IllegalStateException("product with id"+id+"does not exist");
         }
         productRepo.deleteById(id2);
+    }
+
+    public Long findIdByEmail(Object principal) {
+        return sellerRepo.findIdByEmail(principal.toString());
+    }
+    public List<CommentFromDto> showSellerComment(Long id){
+        boolean exist = sellerRepo.existsById(id);
+        if (!exist) {
+            throw new IllegalStateException("seller with id" + id + "does not exist");
+        }
+
+        return  sellerCommentRepo.findAll(id).stream().map(this::convertToDTO).collect(Collectors.toList());
+
+
+    }
+
+
+
+    private CommentFromDto convertToDTO(SellerComment sellerComment){
+        CommentFromDto dto=new CommentFromDto();
+        dto.setComment(sellerComment.getComment());
+        dto.setFrom(sellerComment.getCustomer().getFirstName()+" "+sellerComment.getCustomer().getLastName());
+        return dto;
+    }
+
+    public List showSellerFollower(Long id) {
+            boolean exist = sellerRepo.existsById(id);
+            if (!exist) {
+                throw new IllegalStateException("seller with id" + id + "does not exist");
+            }
+        return followRepo.findCustomerBySellerId(id);
     }
 }

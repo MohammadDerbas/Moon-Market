@@ -31,7 +31,6 @@ public class OrderServices {
     private CustomerProductDTO convertEntityToDto(Order order){
         CustomerProductDTO customerProductDTO=new CustomerProductDTO();
         customerProductDTO.setUserId(order.getCustomer().getId());
-        customerProductDTO.setUserName(order.getCustomer().getUserName());
         customerProductDTO.setFirstName(order.getCustomer().getFirstName());
         customerProductDTO.setLastName(order.getCustomer().getLastName());
         customerProductDTO.setAddress(order.getCustomer().getAddress());

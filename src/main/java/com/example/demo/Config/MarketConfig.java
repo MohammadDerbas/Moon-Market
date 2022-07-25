@@ -2,21 +2,50 @@ package com.example.demo.Config;
 
 import com.example.demo.entity.*;
 import com.example.demo.repo.*;
+import com.example.demo.security.PasswordEncoder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(ProductRepo productRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo,CustomerRepo customerRepo,MemberShipRepo memberShipRepo,PurchaseRepo purchaseRepo,RoleRepo roleRepo,AuthorityRepo authorityRepo,SellerRepo sellerRepo,OrderRepo orderRepo,CategoryRepo categoryRepo,AdminRepo adminRepo,DeliveryManRepo deliveryManRepo,SellerCommentRepo sellerCommentRepo,FollowersRepo followersRepo,StoreHouseRepo storeHouseRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo){
         return args -> {
+            Privilege seller_read=new Privilege("SELLER_READ");
+            Privilege seller_write=new Privilege("SELLER_WRITE");
+            Privilege customer_read=new Privilege("CUSTOMER_READ");
+            Privilege customer_write=new Privilege("CUSTOMER_WRITE");
+
+
+            privilegeRepo.saveAll(List.of(seller_read,seller_write,customer_read,customer_write));
+            List<Privilege> adminPrivileges = Arrays.asList(
+                    seller_read, seller_write,customer_read,customer_write);
+            List<Privilege> sellerPrivileges = Arrays.asList(
+                    seller_read, seller_write,customer_read);
+            List<Privilege> customerPrivileges = Arrays.asList(
+                    seller_read, customer_read,customer_write);
+
+
+            Role adminRole=new Role("ADMIN");
+            adminRole.setPrivileges(adminPrivileges);
+            Role sellerRole=new Role("SELLER");
+            sellerRole.setPrivileges(sellerPrivileges);
+            Role customerRole=new Role("CUSTOMER");
+            customerRole.setPrivileges(customerPrivileges);
+            roleRepo.saveAll(List.of(adminRole,sellerRole,customerRole));
 
 
 
-
+            User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole));
+            PasswordEncoder passwordEncoder=new PasswordEncoder();
+            String encoded=passwordEncoder.bCryptPasswordEncoder().encode(admin.getPassword());
+            admin.setPassword(encoded);
+            admin.setEnabled(true);
+            adminRepo.save(admin);
 
             Size small=new Size("small");
             Size medium=new Size("medium");
@@ -71,48 +100,37 @@ public class MarketConfig {
             MemberShip memberShip4=new MemberShip("Golden");
             MemberShip memberShip5=new MemberShip("Premium");
 
-            Role role =new Role("Admin");
-            Role role1 =new Role("Seller");
-            Role role2 =new Role("Customer");
-            Role role3 =new Role("DeliveryMan");
-            Authority authority=new Authority("Write");
-            Authority authority1=new Authority("Read");
-            Authority authority2=new Authority("ReadWrite");
-            role1.addAuthority(authority);
-            role2.addAuthority(authority1);
-            role.addAuthority(authority2);
-            roleRepo.saveAll(List.of(role1,role2,role3,role));
 
-            User user=new Seller("MohammadDerbas","Mohammad",
+
+            User user=new Seller("Mohammad",
                     "Derbas","mhammad_o_m@hotmail.com",
                     "momo0598134316","AskarCamp",
-                    "0592215224","P4270413");
-            User user1=new Admin("HasanHaq","Hasan",
-                    "Haq","HasanHaq@hotmail.com",
-                    "123456789","Nablus",
-                    "0598123456","P4270413");
+                    "0592215224","P4270413",List.of(sellerRole));
+            String encoded1=passwordEncoder.bCryptPasswordEncoder().encode(user.getPassword());
+            user.setPassword(encoded1);
+            user.setEnabled(true);
 
             //user.addProduct(added1);
 
 
 
 
-            user1.setRole(role);
-            user.setRole(role1);
+
             sellerRepo.save(user);
             StoreHouse added1=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product.getId()),(Seller) user,product);
             StoreHouse added2=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product1.getId()),(Seller) user,product1);
 
             storeHouseRepo.saveAll(List.of(added1,added2));
-            adminRepo.save(user1);
 
-            User Mohammad=new Customer("WajeehSalem","Wajeeh",
+            User Mohammad=new Customer("Wajeeh",
                     "Salem","wajeehsalem@hotmail.com",
                     "momo654321","Jenin",
-                    "0598654321","P4270413");
+                    "0598654321","P4270413",List.of(customerRole));
+            String encoded2=passwordEncoder.bCryptPasswordEncoder().encode(Mohammad.getPassword());
+            Mohammad.setPassword(encoded2);
+            Mohammad.setEnabled(true);
 
 
-            Mohammad.setRole(role2);
 
 
             memberShip5.addCustomer((Customer) Mohammad);
@@ -135,11 +153,13 @@ public class MarketConfig {
 
 
             customerRepo.save(Mohammad);
-            ProductComment productComment=new ProductComment(new ProductCommentId(((Customer)Mohammad).getId(),product.getId()), (Customer) Mohammad,product,"Wow , beautiful one i will come with my friend to buy it");
-            Mohammad.addProductComment(productComment);
+            ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");
+            productComment.setCustomer((Customer) Mohammad);
+            productComment.setProduct(product);
             productCommentRepo.save(productComment);
-
-            SellerComment sellerComment=new SellerComment(new SellerCommentId(((Customer) Mohammad).getId(),((Seller) user).getId()), (Customer) Mohammad, (Seller) user,"Good Seller, I advict to buy from him");
+            SellerComment sellerComment=new SellerComment("good Seller I advice to buy from him");
+            sellerComment.setSeller((Seller) user);
+            sellerComment.setCustomer((Customer) Mohammad);
             sellerCommentRepo.save(sellerComment);
 
 

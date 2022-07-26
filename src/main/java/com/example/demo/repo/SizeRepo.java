@@ -1,10 +1,12 @@
 package com.example.demo.repo;
 
+import com.example.demo.entity.Product;
 import com.example.demo.entity.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,4 +16,6 @@ public interface SizeRepo extends JpaRepository<Size,Long> {
 
     @Query("select s from Size s where s.size = ?1")
     Size findBySize(String size);
+    @Query("select s.products from Size s where s.size=?1")
+    List<Product> findProductsBySize(String size);
 }

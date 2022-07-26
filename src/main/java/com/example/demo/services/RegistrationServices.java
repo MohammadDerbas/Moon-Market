@@ -48,7 +48,7 @@ public class RegistrationServices {
                     Arrays.asList(role)
             );
 
-            memberShipRepo.findByType("No_MemberShip").addCustomer(popo);
+            memberShipRepo.findByType("No-MemberShip").addCustomer(popo);
 
 
             String token = userServices.signUpUser(

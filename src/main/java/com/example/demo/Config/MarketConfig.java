@@ -94,7 +94,7 @@ public class MarketConfig {
 
 
 
-            MemberShip memberShip1=new MemberShip("No_MemberShip");
+            MemberShip memberShip1=new MemberShip("No-MemberShip");
             MemberShip memberShip2=new MemberShip("bronze");
             MemberShip memberShip3=new MemberShip("Silver");
             MemberShip memberShip4=new MemberShip("Golden");

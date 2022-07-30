@@ -4,6 +4,8 @@ import com.example.demo.DTO.CommentDTO;
 import com.example.demo.entity.Customer;
 import com.example.demo.services.CustomerServices;
 import com.example.demo.services.FollowServices;
+import com.example.demo.services.OrderServices;
+import com.example.demo.services.PurchaseServices;
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,15 @@ import java.util.Optional;
 public class CustomerController {
     private final CustomerServices customerServices;
     private final FollowServices followServices;
+    private final OrderServices orderServices;
+    private final PurchaseServices purchaseServices;
 
     @Autowired
-    public CustomerController(CustomerServices customerServices, FollowServices followServices) {
+    public CustomerController(CustomerServices customerServices, FollowServices followServices, OrderServices orderServices, PurchaseServices purchaseServices) {
         this.customerServices = customerServices;
         this.followServices = followServices;
+        this.orderServices = orderServices;
+        this.purchaseServices = purchaseServices;
     }
 
     @GetMapping("/{id}/info")
@@ -47,8 +53,8 @@ public class CustomerController {
     }
     @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
     @GetMapping("/{id}/order-product/{id2}")
-    public void orderProduct(@PathVariable Long id, @PathVariable Long id2) {
-        customerServices.orderProduct(id, id2);
+    public void orderProduct(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = true) Integer quantity) {
+        customerServices.orderProduct(id, id2,quantity);
     }
     @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
     @DeleteMapping("/{id}/delete-order/{id2}")
@@ -57,7 +63,6 @@ public class CustomerController {
     }
     @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
 
-    @JsonView(View.View2.class)
     @GetMapping("/{id}/orders")
     public List showOrders(@PathVariable Long id) {
         return customerServices.showOrders(id);
@@ -90,6 +95,15 @@ public class CustomerController {
     @GetMapping("/{id}/comment-product/{id2}")
     public void commentProduct(@PathVariable Long id, @PathVariable Long id2, @RequestBody CommentDTO comment){
         customerServices.commentProduct(id,id2,comment);
+    }
+    @PutMapping("/{id}/update-order-quantity/{id2}")
+    public void updateQuantity(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = true) Integer quantity){
+        orderServices.updateQuantity(quantity,id,id2);
+    }
+    @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
+    @GetMapping("/{id}/purchases")
+    public List showCustomerPurchase(@PathVariable Long id ){
+        return purchaseServices.showCustomerPurchases(id);
     }
 
 

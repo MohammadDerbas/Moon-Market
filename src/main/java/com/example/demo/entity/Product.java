@@ -32,7 +32,7 @@ public class Product {
     @Column(name = "price",nullable = false )
     @JsonView(View.View2.class)
 
-    private Integer price;
+    private Double price;
 
     @Column(name = "num_Product_Purchaised",columnDefinition = "integer default 0",insertable = false)
     private Integer numberOfProductPurchaised;
@@ -43,14 +43,14 @@ public class Product {
     public Product() {
     }
 
-    public Product(String description, Integer quantity, Integer price) {
+    public Product(String description, Integer quantity, Double price) {
         this.description = description;
         this.quantity = quantity;
         this.price = price;
         this.numberOfProductPurchaised=0;
     }
 
-    public Product(String description, Integer quantity, Integer price, Size size, Type type, Brand brand, Category category) {
+    public Product(String description, Integer quantity, Double price, Size size, Type type, Brand brand, Category category) {
         this.description = description;
         this.quantity = quantity;
         this.price = price;
@@ -86,12 +86,12 @@ public class Product {
         this.points = points;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return price;
     }
 
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
     @ManyToOne
@@ -133,11 +133,7 @@ public class Product {
     @JsonView(View.View2.class)
 
     private Brand brand;
-    @OneToMany(
-          mappedBy = "product",
-            cascade = CascadeType.REMOVE
-    )
-    private List<Purchase> Purchases =new ArrayList<>();
+
     @OneToMany(
             mappedBy = "product",
             cascade = CascadeType.REMOVE
@@ -186,13 +182,7 @@ public class Product {
         this.comments = comments;
     }
 
-    public List<Purchase> getPurchases() {
-        return Purchases;
-    }
 
-    public void setPurchases(List<Purchase> Purchases) {
-        this.Purchases = Purchases;
-    }
 
     public Brand getBrand() {
         return brand;

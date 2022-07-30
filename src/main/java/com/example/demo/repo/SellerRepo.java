@@ -23,4 +23,5 @@ public interface SellerRepo extends UserRepo{
     List<User> findAll();
  @Query("select u.id from Seller u where u.email=?1")
   Long findIdByEmail(String email);
+
 }

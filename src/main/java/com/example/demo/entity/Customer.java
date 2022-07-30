@@ -67,10 +67,7 @@ public class Customer extends User  {
     private MemberShip memberShip;
 
 
-    @OneToMany(
-            mappedBy = "customer"
-    )
-    private List<Purchase> Purchases =new ArrayList<>();
+
     @OneToMany(
             mappedBy = "customer"
     )
@@ -147,13 +144,7 @@ public class Customer extends User  {
         this.memberShip = memberShip;
     }
 
-    public List<Purchase> getPurchases() {
-        return Purchases;
-    }
 
-    public void setPurchases(List<Purchase> purchases) {
-        Purchases = purchases;
-    }
 
     public List<Order> getOrders() {
         return orders;
@@ -174,14 +165,7 @@ public class Customer extends User  {
     public MemberShip getMemberShip() {
         return memberShip;
     }
-    public void addPurchase(Purchase purchase){
-        Purchases.add(purchase);
-    }
-    public void removePurchase(Purchase purchase){
-        if(Purchases.contains(purchase)){
-            Purchases.remove(purchase);
-        }
-    }
+
     public void addToCart(Order order){
         orders.add(order);
     }

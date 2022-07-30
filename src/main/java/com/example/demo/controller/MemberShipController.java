@@ -5,6 +5,7 @@ import com.example.demo.entity.Product;
 import com.example.demo.services.MemberShipServices;
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class MemberShipController {
     }
     @GetMapping("/{membership}")
     @JsonView(View.View3.class)
+    @PreAuthorize("hasAuthority('Admin')")
     public List<Customer> findCustomersByMemberShip(@PathVariable String membership){
         return memberShipServices.findCustomersByMembership(membership);
     }

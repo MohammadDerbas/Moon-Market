@@ -14,12 +14,12 @@ private Long productId;
 private String description;
 private Brand brand;
 private Size size;
-
-
+private Double price;
+private Integer quantityOrder;
     public CustomerProductDTO() {
     }
 
-    public CustomerProductDTO(Long userId,  String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, Size size) {
+    public CustomerProductDTO(Long userId, String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, Size size, Double price, Integer quantityOrder) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -30,6 +30,18 @@ private Size size;
         this.description = description;
         this.brand = brand;
         this.size = size;
+        this.price = price;
+        this.quantityOrder = quantityOrder;
+    }
+
+
+
+    public Integer getQuantityOrder() {
+        return quantityOrder;
+    }
+
+    public void setQuantityOrder(Integer quantityOrder) {
+        this.quantityOrder = quantityOrder;
     }
 
     public Long getUserId() {
@@ -113,4 +125,13 @@ private Size size;
     public void setSize(Size size) {
         this.size = size;
     }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 }
+

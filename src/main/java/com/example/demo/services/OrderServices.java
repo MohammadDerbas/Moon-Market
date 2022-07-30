@@ -1,31 +1,48 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.CustomerProductDTO;
-import com.example.demo.entity.Customer;
-import com.example.demo.entity.Order;
-import com.example.demo.entity.Product;
+import com.example.demo.entity.*;
+import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.OrderRepo;
+import com.example.demo.repo.ProductRepo;
+import com.example.demo.repo.PurchaseRepo;
 import com.example.demo.repo.SellerRepo;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderServices {
     private final OrderRepo orderRepo;
     private final SellerRepo sellerRepo;
+    private final ProductRepo productRepo;
+    private final PurchaseRepo purchaseRepo;
 
     @Autowired
-    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo) {
+    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo, ProductRepo productRepo, PurchaseRepo purchaseRepo) {
         this.orderRepo = orderRepo;
         this.sellerRepo = sellerRepo;
+        this.productRepo = productRepo;
+        this.purchaseRepo = purchaseRepo;
     }
     public List<CustomerProductDTO> showOrders() {
             return orderRepo.findAll().stream().map(this::convertEntityToDto).collect(Collectors.toList());
+        }
+        public List <Product>showCustomerOrders(){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String s  = authentication.getName();
+
+        return orderRepo.findAlLProductByCustomer_Id(orderRepo.getIdByEmail(s));
+        }
+        public Double price(Long id){
+        AtomicReference<Double> sum= new AtomicReference<>(0.0);
+            orderRepo.findAlLOrdersByCustomer_Id(id).stream().forEach((order)-> sum.updateAndGet(v -> (v*10 + order.getPrice()*10)/10));
+            return sum.get();
         }
 
     private CustomerProductDTO convertEntityToDto(Order order){
@@ -40,6 +57,33 @@ public class OrderServices {
         customerProductDTO.setBrand(order.getProduct().getBrand());
         customerProductDTO.setSize(order.getProduct().getSize());
         customerProductDTO.setProductId(order.getProduct().getId());
+        customerProductDTO.setPrice(order.getProduct().getPrice());
+        customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));
         return customerProductDTO;
     }
+    public void deleteAllByCustomerId(Long id){
+        orderRepo.deleteAllByCustomerId(id);
+    }
+
+    public void updateQuantityProductByCustomerId(Long id){
+        System.out.println(id+"8888888888888888888888");
+
+        List<Product> product=orderRepo.findAlLProductByCustomer_Id(id);
+        product.stream().forEach(product1 -> productRepo.updateQuantity(product1.getQuantity()-orderRepo.quantity(new OrderId(id,product1.getId())),product1.getId()));
+
+    }
+    public Long getIdByEmail(String email){
+        return orderRepo.getIdByEmail(email);
+    }
+    public void updateQuantity(Integer quantity,Long id,Long id2){
+        if(!(orderRepo.isOrderExist(new OrderId(id,id2)))){
+            throw new ApiRequestException("this order not found ");
+        }
+        orderRepo.updateQuantity(quantity,new OrderId(id,id2));
+    }
+    public void buyOrders(Long id){
+        orderRepo.findAlLOrdersByCustomer_Id(id).stream().forEach(order -> purchaseRepo.save(new Purchase(order.getCustomer().getId(),order.getProduct().getId(),order.getDate(),order.getPrice(),order.getQuantity())));
+    }
+
+
 }

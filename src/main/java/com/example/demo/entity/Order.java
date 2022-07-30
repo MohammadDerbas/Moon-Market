@@ -23,21 +23,27 @@ public class Order {
             name="date"
     )
     private LocalDate date;
+    private Integer quantity;
+    private Double price;
 
     public Order() {
     }
 
-    public Order(Customer customer, Product product) {
+    public Order(Customer customer, Product product,Integer quantity) {
         this.customer = customer;
         this.product = product;
         this.date = LocalDate.now();
+        this.quantity=quantity;
+        this.price=product.getPrice()*quantity;
     }
 
-    public Order(OrderId id, Customer customer, Product product) {
+    public Order(OrderId id, Customer customer, Product product,Integer quantity) {
         this.id = id;
         this.customer = customer;
         this.product = product;
         this.date = LocalDate.now();
+        this.quantity=quantity;
+        this.price=product.getPrice()*quantity;
     }
 
     public OrderId getId() {
@@ -70,5 +76,21 @@ public class Order {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

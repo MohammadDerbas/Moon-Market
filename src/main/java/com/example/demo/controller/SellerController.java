@@ -70,7 +70,7 @@ public class SellerController {
     public void updateSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,
                                           @RequestParam(required = false) String description,
                                           @RequestParam(required = false) Integer quantity,
-                                          @RequestParam(required = false) Integer price,
+                                          @RequestParam(required = false) Double price,
                                           @RequestParam(required = false) String size,
                                           @RequestParam(required = false) String type,
                                           @RequestParam(required = false) String brand,

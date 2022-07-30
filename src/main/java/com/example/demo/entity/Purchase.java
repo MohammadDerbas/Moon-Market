@@ -6,67 +6,79 @@ import java.time.LocalDate;
 @Entity(name="Purchase")
 @Table(name = "purchase")
 public class Purchase {
-    @EmbeddedId
-    private PurchaseId id;
-    @ManyToOne
-    @MapsId("customerId")
-    @JoinColumn(name = "customer_id",
-    foreignKey = @ForeignKey(name="purchase_customer_id_fk"))
-    private Customer customer;
-    @ManyToOne
-    @MapsId("productId")
-    @JoinColumn(name = "product_id",
-            foreignKey = @ForeignKey(name="purchase_product_id_fk"))
-    private Product product;
-    @Column(
-        name = "purchase_at"
-    )
-    private LocalDate purchaseAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name="customer_id")
+    private Long customerId;
+    @Column(name="product_id")
+    private Long productId;
+
+    private LocalDate date;
+    private Double price;
+    private Integer quantity;
 
     public Purchase() {
     }
 
-    public Purchase(PurchaseId id, Customer customer, Product product) {
-        this.id = id;
-        this.customer = customer;
-        this.product = product;
-        this.purchaseAt=LocalDate.now();
+    public Purchase(Long customerId, Long productId, LocalDate date, Double price, Integer quantity) {
+        this.customerId = customerId;
+        this.productId = productId;
+        this.date = date;
+        this.price = price;
+        this.quantity = quantity;
     }
 
-    public Purchase(Customer customer, Product product) {
-        this.customer = customer;
-        this.product = product;
+    public Purchase(Long customerId, Long productId) {
+        this.customerId = customerId;
+        this.productId = productId;
     }
 
-    public PurchaseId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(PurchaseId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public Product getProduct() {
-        return product;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public void setPurchaseAt(LocalDate purchaseAt) {
-        this.purchaseAt = purchaseAt;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public LocalDate getPurchaseAt() {
-        return purchaseAt;
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

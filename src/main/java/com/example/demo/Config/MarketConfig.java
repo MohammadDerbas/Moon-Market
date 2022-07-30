@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,8 +69,8 @@ public class MarketConfig {
 
 
 
-            Product product=new Product("Cotton T-shirt",30,50);
-            Product product2=new Product("Cotton Trouser",100,100);
+            Product product=new Product("Cotton T-shirt",30,  0.50);
+            Product product2=new Product("Cotton Trouser",100,.100);
 
             man_clothes.addProduct(product);
             woman_clothes.addProduct(product2);
@@ -87,7 +88,7 @@ public class MarketConfig {
             brandRepo.saveAll(List.of(lacoste,hugo_boss));
 
             product.buy();
-            Product product1=new Product("white dress",20,1500,small,dress,lacoste,woman_clothes);
+            Product product1=new Product("white dress",20,2.0,small,dress,lacoste,woman_clothes);
             productRepo.saveAll(List.of(product,product1,product2));
 
 
@@ -136,17 +137,22 @@ public class MarketConfig {
             memberShip5.addCustomer((Customer) Mohammad);
             memberShipRepo.saveAll(List.of(memberShip1,memberShip2,memberShip3,memberShip4,memberShip5));
             //Mohammad.addPurchase(new Purchase(new PurchaseId(1l,1l),Mohammad,product));
-            Purchase purchase=new Purchase(new PurchaseId(1L,1L), (Customer) Mohammad,product);
-            Purchase purchase2=new Purchase(new PurchaseId(1L,2L), (Customer) Mohammad,product2);
+            Purchase purchase=new Purchase(3l,1l, LocalDate.of(2022,07,29),2.5,5);
+            Purchase purchase2=new Purchase(3l,1l, LocalDate.of(2022,06,29),3.0,6);
+            Purchase purchase3=new Purchase(3l,1l, LocalDate.of(2022,06,24),4.5,9);
+            Purchase purchase4=new Purchase(3l,1l, LocalDate.of(2021,06,02),5.0,10);
+            Purchase purchase5=new Purchase(3l,1l, LocalDate.of(2021,06,24),2.0,4);
 
-            purchaseRepo.saveAll(List.of(purchase,purchase2));
-            System.out.println(purchase.getId());
+
+
+            purchaseRepo.saveAll(List.of(purchase,purchase2,purchase3,purchase4,purchase5));
+            /*System.out.println(purchase.getId());*/
             System.out.println(product.getId());
-            Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product);
+            Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product,2);
             orderRepo.save(order);
             Mohammad.addToCart(order);
-            Mohammad.addPurchase(purchase);
-            Mohammad.addPurchase(purchase2);
+           /* Mohammad.addPurchase(purchase);
+            Mohammad.addPurchase(purchase2);*/
             Followers followers=new Followers(new FollowersId(((Customer) Mohammad).getId(),((Seller) user).getId()), (Customer) Mohammad, (Seller) user);
             followersRepo.save(followers);
             Mohammad.follow(followers);

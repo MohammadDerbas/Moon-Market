@@ -2,13 +2,17 @@ package com.example.demo.services;
 
 import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DTO.CommentFromDto;
+import com.example.demo.DTO.CustomerProductDTO;
+import com.example.demo.DTO.CustomerProductPurchaseDTO;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -92,7 +96,7 @@ public class CustomerServices {
     }
 
 
-    public void orderProduct(Long id, Long id2) {
+    public void orderProduct(Long id, Long id2,Integer quantity) {
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
             throw new ApiRequestException("customer with id" + id + "does not exist");
@@ -101,10 +105,26 @@ public class CustomerServices {
         if (!exist1) {
             throw new ApiRequestException("product with id" + id2 + "does not exist");
         }
-        Optional<Customer> customer=customerRepo.findUserByID(id);
-        Product product=productRepo.findProductById(id2);
 
-        Order order=new Order(new OrderId(id,id2),customer.get(),product);
+        Product product=productRepo.findProductById(id2);
+        Optional<Customer> customer=customerRepo.findUserByID(id);
+        if(orderRepo.isOrderExist(new OrderId(id,id2))){
+            Integer oldQuantity=orderRepo.quantity(new OrderId(id,id2));
+            if(orderRepo.quantity(new OrderId(id,id2))+quantity>productRepo.quantityByProduct(product)){
+                throw new ApiRequestException("there is no enough quantity of this product");
+
+            }
+            Order order=new Order(new OrderId(id,id2),customer.get(),product,quantity+oldQuantity);
+            orderRepo.save(order);
+            return;
+
+        }
+
+        if(quantity>productRepo.quantityByProduct(product)){
+            throw new ApiRequestException("there is no enough quantity of this product");
+        }
+
+        Order order=new Order(new OrderId(id,id2),customer.get(),product,quantity);
         orderRepo.save(order);
 
     }
@@ -136,7 +156,8 @@ public class CustomerServices {
         if (!exist) {
             throw new ApiRequestException("customer with id" + id + "does not exist");
         }
-        return orderRepo.findAlLProductByCustomer_Id(id);
+        return orderRepo.findAlLOrdersByCustomer_Id(id).stream().map(this::convertEntityToDto).collect(Collectors.toList());
+
     }
 
     public void deleteOrder(Long id, Long id2) {
@@ -210,9 +231,26 @@ public class CustomerServices {
         if (!exist) {
             throw new ApiRequestException("product with id" + id + "does not exist");
         }
+
         return  productCommentRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
 
 
+    }
+    private CustomerProductDTO convertEntityToDto(Order order){
+        CustomerProductDTO customerProductDTO=new CustomerProductDTO();
+        customerProductDTO.setUserId(order.getCustomer().getId());
+        customerProductDTO.setFirstName(order.getCustomer().getFirstName());
+        customerProductDTO.setLastName(order.getCustomer().getLastName());
+        customerProductDTO.setAddress(order.getCustomer().getAddress());
+        customerProductDTO.setPostalCode(order.getCustomer().getPostalCode());
+        customerProductDTO.setPhone(order.getCustomer().getPhone());
+        customerProductDTO.setDescription(order.getProduct().getDescription());
+        customerProductDTO.setBrand(order.getProduct().getBrand());
+        customerProductDTO.setSize(order.getProduct().getSize());
+        customerProductDTO.setProductId(order.getProduct().getId());
+        customerProductDTO.setPrice(order.getProduct().getPrice());
+        customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));
+        return customerProductDTO;
     }
 
 
@@ -233,4 +271,7 @@ public class CustomerServices {
             }
         return followRepo.findSellerByCustomerId(id);
     }
+
+
+
 }

@@ -149,7 +149,7 @@ public class SellerServices {
         return sellers;
     }
 
-    public void updateSellerProductWithId(Long id, Long id2, String description, Integer quantity, Integer price, String size, String type, String brand, String category) {
+    public void updateSellerProductWithId(Long id, Long id2, String description, Integer quantity, Double price, String size, String type, String brand, String category) {
         boolean exists = sellerRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");

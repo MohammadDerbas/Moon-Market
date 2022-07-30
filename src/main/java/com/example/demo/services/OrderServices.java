@@ -3,16 +3,14 @@ package com.example.demo.services;
 import com.example.demo.DTO.CustomerProductDTO;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
-import com.example.demo.repo.OrderRepo;
-import com.example.demo.repo.ProductRepo;
-import com.example.demo.repo.PurchaseRepo;
-import com.example.demo.repo.SellerRepo;
+import com.example.demo.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -22,13 +20,15 @@ public class OrderServices {
     private final SellerRepo sellerRepo;
     private final ProductRepo productRepo;
     private final PurchaseRepo purchaseRepo;
+    private final CustomerRepo customerRepo;
 
     @Autowired
-    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo, ProductRepo productRepo, PurchaseRepo purchaseRepo) {
+    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo, ProductRepo productRepo, PurchaseRepo purchaseRepo, CustomerRepo customerRepo) {
         this.orderRepo = orderRepo;
         this.sellerRepo = sellerRepo;
         this.productRepo = productRepo;
         this.purchaseRepo = purchaseRepo;
+        this.customerRepo = customerRepo;
     }
     public List<CustomerProductDTO> showOrders() {
             return orderRepo.findAll().stream().map(this::convertEntityToDto).collect(Collectors.toList());
@@ -82,7 +82,10 @@ public class OrderServices {
         orderRepo.updateQuantity(quantity,new OrderId(id,id2));
     }
     public void buyOrders(Long id){
-        orderRepo.findAlLOrdersByCustomer_Id(id).stream().forEach(order -> purchaseRepo.save(new Purchase(order.getCustomer().getId(),order.getProduct().getId(),order.getDate(),order.getPrice(),order.getQuantity())));
+        Optional<Customer> customer=customerRepo.findUserByID(id);
+        orderRepo.findAlLOrdersByCustomer_Id(id).stream().forEach(order -> {purchaseRepo.save(new Purchase(order.getCustomer().getId(),order.getProduct().getId(),order.getDate(),order.getPrice(),order.getQuantity()));
+                customer.get().setCustomerPurchases(customer.get().getCustomerPurchases()+order.getPrice());}
+        );
     }
 
 

@@ -47,7 +47,7 @@ public class Customer extends User  {
 
     )
     @JsonView( View.View3.class)
-    private Integer customerPurchases;
+    private Double customerPurchases;
 
 
     @ManyToOne
@@ -94,7 +94,7 @@ public class Customer extends User  {
         this.activate = true;
         this.points = 0;
         this.reportCounter = 0;
-        this.customerPurchases = 0;
+        this.customerPurchases = 0.0;
 
     }
 
@@ -132,11 +132,11 @@ public class Customer extends User  {
         this.reportCounter = reportCounter;
     }
 
-    public Integer getCustomerPurchases() {
+    public Double getCustomerPurchases() {
         return customerPurchases;
     }
 
-    public void setCustomerPurchases(Integer customerPurchases) {
+    public void setCustomerPurchases(Double customerPurchases) {
         this.customerPurchases = customerPurchases;
     }
 

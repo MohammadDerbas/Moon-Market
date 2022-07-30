@@ -142,6 +142,7 @@ public class MarketConfig {
             Purchase purchase3=new Purchase(3l,1l, LocalDate.of(2022,06,24),4.5,9);
             Purchase purchase4=new Purchase(3l,1l, LocalDate.of(2021,06,02),5.0,10);
             Purchase purchase5=new Purchase(3l,1l, LocalDate.of(2021,06,24),2.0,4);
+            ((Customer) Mohammad).setCustomerPurchases(17.0);
 
 
 

@@ -73,13 +73,33 @@ public class SellerServices {
         return productRepo.getReferenceById(id2);
     }
 
-    public Optional<Seller> getSeller(Long id) {
+    public Optional<Seller> getSeller(Long id,Boolean follow,String email) {
         boolean exists = sellerRepo.existsById(id);
-        System.out.println(exists);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
         }
         Optional<Seller> seller = sellerRepo.findUserById(id);
+        boolean exist1=customerRepo.existsByEmail(email);
+        if(!exist1){
+            throw new ApiRequestException("He is not a customer try to enter with a customer account");
+
+        }
+        Customer customer= (Customer) customerRepo.findUserByEmail(email).get();
+        if(follow!=null){
+            Followers followers=new Followers(new FollowersId(customer.getId(),id),customer,seller.get());
+            if(follow){
+                followRepo.save(followers);
+            }
+            else{
+                if(!followRepo.isCustmoerFollowSeller(customer.getId(),id)){
+                    throw new ApiRequestException("customer with id "+customer.getId()+"did not follow seller with id"+id);
+
+                }
+                else{
+                    followRepo.delete(followers);
+                }
+            }
+        }
         return seller;
 
     }
@@ -207,7 +227,34 @@ public class SellerServices {
 
     }
 
-    public List<User> showSellers() {
+    public List<User> showSellers(Long sellerId,Boolean follow,String email) {
+
+        boolean exists = sellerRepo.existsById(sellerId);
+        if (!exists) {
+            throw new ApiRequestException("Seller with id " + sellerId + "does not exist");
+        }
+        Optional<Seller> seller = sellerRepo.findUserById(sellerId);
+        boolean exist1=customerRepo.existsByEmail(email);
+        if(!exist1){
+            throw new ApiRequestException("He is not a customer try to enter with a customer account");
+
+        }
+        Customer customer= (Customer) customerRepo.findUserByEmail(email).get();
+        if(follow!=null){
+            Followers followers=new Followers(new FollowersId(customer.getId(),sellerId),customer,seller.get());
+            if(follow){
+                followRepo.save(followers);
+            }
+            else{
+                if(!followRepo.isCustmoerFollowSeller(customer.getId(),sellerId)){
+                    throw new ApiRequestException("customer with id "+customer.getId()+"did not follow seller with id"+sellerId);
+
+                }
+                else{
+                    followRepo.delete(followers);
+                }
+            }
+        }
         List<User> sellers = sellerRepo.findAll();
         return sellers;
     }

@@ -20,5 +20,7 @@ public interface CustomerRepo extends UserRepo {
     @Query("select (count(u) > 0) from Customer u where u.id = ?1")
     @Override
     boolean existsById(Long id);
+    @Query("select (count(u) > 0) from Customer u where u.email = ?1")
+    boolean existsByEmail(String email);
 
 }

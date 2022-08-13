@@ -35,9 +35,9 @@ public class SellerController {
 
     @GetMapping("/{id}/info")
     @JsonView(View.View1.class)
-    public Optional<Seller> infoSeller(@PathVariable("id") Long id) {
+    public Optional<Seller> infoSeller(@PathVariable("id") Long id,@RequestParam(required = false) Boolean follow,Principal principal) {
 
-        return sellerServices.getSeller(id);
+        return sellerServices.getSeller(id,follow,principal.getName());
     }
 
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
@@ -104,9 +104,9 @@ public class SellerController {
 
     @GetMapping("/")
     @JsonView(View.View1.class)
-    public List<User> sellers() {
+    public List<User> sellers(@RequestParam(required = false)Long sellerId,@RequestParam(required = false) Boolean follow,Principal principal) {
 
-        return sellerServices.showSellers();
+        return sellerServices.showSellers(sellerId,follow,principal.getName());
     }
    /* @GetMapping("/")
     public String sellers() {

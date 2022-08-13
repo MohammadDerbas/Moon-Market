@@ -70,21 +70,18 @@ public class CustomerController {
         return customerServices.showOrders(id);
     }
 
-    @GetMapping("/{id}/follow/{id2}")
-    @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
-    public void follow(@PathVariable Long id,@PathVariable Long id2) {
-    customerServices.followSeller(id,id2);
-    }
-    @DeleteMapping ("/{id}/delete-follow/{id2}")
-    @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
-    public void removeFollow(@PathVariable Long id,@PathVariable Long id2) {
-        customerServices.removeFollow(id,id2);
-    }
     @GetMapping("/{id}/following")
     @PreAuthorize("hasAuthority('CUSTOMER_READ')")
     @JsonView(View.View1.class)
     public List showFollowing(@PathVariable Long id){
         return customerServices.showCustomerFollowing(id);
+    }
+
+    @GetMapping("/{id}/liked-product")
+    @PreAuthorize("hasAuthority('CUSTOMER_READ')")
+    @JsonView(View.View2.class)
+    public List showlikedProduct(@PathVariable Long id){
+        return customerServices.showCustomerLikedProduct(id);
     }
 
 

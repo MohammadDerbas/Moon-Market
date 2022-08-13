@@ -76,6 +76,10 @@ public class Customer extends User  {
          mappedBy = "customer"
     )
     private List <Followers>followers=new ArrayList<>();
+    @OneToMany (
+            mappedBy = "customer"
+    )
+    private List <Like>likes=new ArrayList<>();
    @OneToMany(
            mappedBy = "customer"
    )
@@ -86,14 +90,7 @@ public class Customer extends User  {
     )
     @JsonIgnore
     private List <SellerComment> sellerComments=new ArrayList<>();
-    @ManyToMany
-    @JoinTable(
-            name = "product_like",
-            joinColumns = @JoinColumn(
-                    name = "customer_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "product_id", referencedColumnName = "id"))
-     private List<Product> likedProduct=new ArrayList<>();
+
     public Customer() {
     }
 
@@ -174,12 +171,12 @@ public class Customer extends User  {
         return memberShip;
     }
 
-    public List<Product> getLikedProduct() {
-        return likedProduct;
+    public List<Like> getLikes() {
+        return likes;
     }
 
-    public void setLikedProduct(List<Product> likedProduct) {
-        this.likedProduct = likedProduct;
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 
     public void addToCart(Order order){
@@ -203,18 +200,9 @@ public class Customer extends User  {
         }
 
     }
-    public void like(Product product){
 
-        this.likedProduct.add(product);
 
-    }
-    public void removeLike(@NotNull Product product){
-        if(!this.likedProduct.contains(product)){
-            this.likedProduct.remove(product);
 
-        }
-
-    }
 
     public void  addProductComment(ProductComment productComment){
       productComments.add(productComment);

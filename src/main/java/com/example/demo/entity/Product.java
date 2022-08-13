@@ -40,8 +40,10 @@ public class Product {
     LocalDate localDate=LocalDate.now();
 @Column(name = "date",insertable = false,columnDefinition = "Date DEFAULT CURRENT_DATE")
     private Date date;
-    @ManyToMany(mappedBy = "likedProduct")
-    List<Customer> likes;
+    @OneToMany(
+            mappedBy = "product"
+    )
+    private List <Like> likes=new ArrayList<>();
     public Product() {
     }
 

@@ -11,6 +11,7 @@ import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -108,9 +109,11 @@ public class CustomerController {
     }
     @PreAuthorize("hasAuthority('CUSTOMER') and #id==authentication.principal.id")
     @PostMapping("{id}/update-image")
-    public void updateCustomerImage(@PathVariable Long id,@RequestBody ImageDto image){
+
+    public void updateCustomerImage(@PathVariable Long id, @RequestBody ImageDto image){
         customerServices.updateCustomerImage(id,image);
     }
+
 
 
 }

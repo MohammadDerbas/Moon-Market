@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo){
         return args -> {
             Privilege seller_read=new Privilege("SELLER_READ");
             Privilege seller_write=new Privilege("SELLER_WRITE");
@@ -186,7 +186,8 @@ public class MarketConfig {
             String encoded2=passwordEncoder.bCryptPasswordEncoder().encode(Mohammad.getPassword());
             Mohammad.setPassword(encoded2);
             Mohammad.setEnabled(true);
-            Mohammad.like(product);
+
+
 
 
 
@@ -216,6 +217,8 @@ public class MarketConfig {
 
 
             customerRepo.save(Mohammad);
+            Like like=new Like(new LikeId(Mohammad.getId(),product.getId()), (Customer) Mohammad,product);
+            likeRepo.save(like);
             ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");
             productComment.setCustomer((Customer) Mohammad);
             productComment.setProduct(product);

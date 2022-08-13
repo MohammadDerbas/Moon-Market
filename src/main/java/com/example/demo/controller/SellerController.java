@@ -11,8 +11,11 @@ import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,15 +61,17 @@ public class SellerController {
 
     @GetMapping("{id}/product")
     @JsonView(View.View2.class)
-    public List<Product> showProduct(@PathVariable Long id) {
-        return sellerServices.showProduct(id);
+    public List<Product> showProduct(@PathVariable Long id, @RequestParam (required = false)Long productId,@RequestParam(required = false) Boolean like,Principal principal) {
+        return sellerServices.showProduct(id,productId,like,principal.getName());
     }
 
     @GetMapping("{id}/product/{id2}")
     @JsonView(View.View2.class)
-    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2) {
-        return sellerServices.getInfoSellerProductWithId(id, id2);
+    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = false) Boolean like,Principal principal) {
+        return sellerServices.getInfoSellerProductWithId(id, id2,like,principal.getName());
+
     }
+
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
     @PutMapping("{id}/product/{id2}/update")
     public void updateSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,

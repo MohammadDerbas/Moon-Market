@@ -1,26 +1,66 @@
 package com.example.demo.services;
 
+import com.example.demo.entity.Like;
+import com.example.demo.entity.LikeId;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.Size;
+import com.example.demo.exception.ApiRequestException;
+import com.example.demo.repo.CustomerRepo;
+import com.example.demo.repo.LikeRepo;
 import com.example.demo.repo.ProductRepo;
+import com.example.demo.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProductServices {
 
     private final ProductRepo productRepo;
+    private final CustomerRepo customerRepo;
+    private final LikeRepo likeRepo;
+    private final UserRepo userRepo;
     @Autowired
-    public ProductServices(ProductRepo productRepo) {
+    public ProductServices(ProductRepo productRepo, CustomerRepo customerRepo, LikeRepo likeRepo, UserRepo userRepo) {
         this.productRepo = productRepo;
+        this.customerRepo = customerRepo;
+        this.likeRepo = likeRepo;
+        this.userRepo = userRepo;
     }
-    public List<Product> listProduct() {
+    public List<Product> listProduct(Long productId,Boolean like,String email) {
+        if(productId!=null){
+            boolean exist=productRepo.existsById(productId);
+            if(!exist){
+                throw new ApiRequestException("product with id"+productId+"does not exist");
+            }
+        }
+        long id=userRepo.findUserByEmail(email).get().getId();
+        Boolean exist=userRepo.existsById(id);
+        if(!exist){
+            throw new ApiRequestException("user with id"+id+"does not exist");
+
+        }
+        boolean exist2=customerRepo.existsById(id);
+        if(!exist2){
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+
+        }
+        if(like!=null) {
+            if (like) {
+                Long id3 = customerRepo.findUserByEmail(email).get().getId();
+                Like like1 = new Like(new LikeId(id3, productId), customerRepo.findUserByID(id3).get(), productRepo.findProductById(productId));
+                likeRepo.save(like1);
+            } else {
+                if(!likeRepo.isCustmoerLikeProduct(id,productId)){
+                    throw new ApiRequestException("customer with id +"+id+" did not like product with id"+id);
+
+                }
+                likeRepo.deleteById(new LikeId(id, productId));
+            }
+        }
         return productRepo.findAll();
     }
 

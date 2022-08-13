@@ -31,8 +31,10 @@ public class SellerServices {
     private final FollowRepo followRepo;
     private final ColorPropsRepo colorPropsRepo;
     private final ImagesRepo imagesRepo;
+    private final CustomerRepo customerRepo;
+    private final LikeRepo likeRepo;
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -45,9 +47,11 @@ public class SellerServices {
         this.followRepo = followRepo;
         this.colorPropsRepo = colorPropsRepo;
         this.imagesRepo = imagesRepo;
+        this.customerRepo = customerRepo;
+        this.likeRepo = likeRepo;
     }
 
-    public Product getInfoSellerProductWithId(Long id, Long id2) {
+    public Product getInfoSellerProductWithId(Long id, Long id2,Boolean like,String email) {
         boolean exists = sellerRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
@@ -56,7 +60,16 @@ public class SellerServices {
         if (!productExists) {
             throw new ApiRequestException("Product with id " + id2 + "does not exist");
         }
-
+        if(like!=null) {
+            Long id3 = customerRepo.findUserByEmail(email).get().getId();
+            Like like1 = new Like(new LikeId(id3, id2), customerRepo.findUserByID(id3).get(), productRepo.findProductById(id2));
+            if (like) {
+                likeRepo.save(like1);
+            }
+            else{
+                likeRepo.delete(like1);
+            }
+        }
         return productRepo.getReferenceById(id2);
     }
 
@@ -163,13 +176,35 @@ public class SellerServices {
         storeHouseRepo.save(op);
     }
 
-    public List<Product> showProduct(Long id) {
-        boolean exists = sellerRepo.existsById(id);
-        if (!exists) {
-            throw new ApiRequestException("Seller with id " + id + "does not exist");
+    public List<Product> showProduct(Long id,Long productId,Boolean like,String email) {
+        if (productId != null) {
+            boolean exist = productRepo.existsById(productId);
+            if (!exist) {
+                throw new ApiRequestException("product with id" + productId + "does not exist");
+            }
         }
+        long id2 = userRepo.findUserByEmail(email).get().getId();
 
+        boolean exist2 = customerRepo.existsById(id2);
+        if (!exist2) {
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+
+        }
+        if (like != null) {
+            Like like1 = new Like(new LikeId(id2, productId), customerRepo.findUserByID(id2).get(), productRepo.findProductById(productId));
+            if (like) {
+                likeRepo.save(like1);
+            } else {
+                if (!likeRepo.isCustmoerLikeProduct(id2, productId)) {
+                    throw new ApiRequestException("customer with id +" + id2 + " did not like product with id" + id);
+
+                }
+                likeRepo.delete(like1);
+
+            }
+        }
         return productRepo.showProductWithSpecificSeller(id);
+
     }
 
     public List<User> showSellers() {
@@ -378,4 +413,8 @@ public class SellerServices {
         userRepo.updateUserImage(image.getImage());
 
     }
+
+
+
+
 }

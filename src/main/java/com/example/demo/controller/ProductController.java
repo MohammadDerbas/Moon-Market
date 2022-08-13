@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -23,8 +24,8 @@ public class ProductController {
     }
     @GetMapping("/")
     @JsonView(View.View2.class)
-    List<Product> productList(){
-        return productServices.listProduct();
+    List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, Principal principal){
+        return productServices.listProduct(productId,like,principal.getName());
 
     }
 

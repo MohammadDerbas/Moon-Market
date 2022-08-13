@@ -275,20 +275,18 @@ public class User implements UserDetails {
     public void follow(Followers followers){
 
     }
+    public void like(LikeId likeId){
+
+    }
     public void addProduct(StoreHouse storeHouse){
 
     }
 
-    public void like(Product product){
 
 
+    public List<Product> getLikedProduct() {
+        return new ArrayList<>();
     }
-    public void removeLike(@NotNull Product product){
-
-
-        }
-
-
 
     public String getProfilePic() {
         return profilePic;

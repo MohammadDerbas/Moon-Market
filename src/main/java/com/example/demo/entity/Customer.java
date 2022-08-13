@@ -86,11 +86,19 @@ public class Customer extends User  {
     )
     @JsonIgnore
     private List <SellerComment> sellerComments=new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "product_like",
+            joinColumns = @JoinColumn(
+                    name = "customer_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "product_id", referencedColumnName = "id"))
+     private List<Product> likedProduct=new ArrayList<>();
     public Customer() {
     }
 
-    public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
-        super( firstName, lastName, email, password, address, phone, postalCode,roles);
+    public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles,String profilePic) {
+        super( firstName, lastName, email, password, address, phone, postalCode,roles,profilePic);
         this.activate = true;
         this.points = 0;
         this.reportCounter = 0;
@@ -166,6 +174,14 @@ public class Customer extends User  {
         return memberShip;
     }
 
+    public List<Product> getLikedProduct() {
+        return likedProduct;
+    }
+
+    public void setLikedProduct(List<Product> likedProduct) {
+        this.likedProduct = likedProduct;
+    }
+
     public void addToCart(Order order){
         orders.add(order);
     }
@@ -187,6 +203,19 @@ public class Customer extends User  {
         }
 
     }
+    public void like(Product product){
+
+        this.likedProduct.add(product);
+
+    }
+    public void removeLike(@NotNull Product product){
+        if(!this.likedProduct.contains(product)){
+            this.likedProduct.remove(product);
+
+        }
+
+    }
+
     public void  addProductComment(ProductComment productComment){
       productComments.add(productComment);
     }

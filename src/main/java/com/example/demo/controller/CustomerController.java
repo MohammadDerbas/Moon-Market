@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.ImageDto;
 import com.example.demo.entity.Customer;
 import com.example.demo.services.CustomerServices;
 import com.example.demo.services.FollowServices;
@@ -105,7 +106,11 @@ public class CustomerController {
     public List showCustomerPurchase(@PathVariable Long id ){
         return purchaseServices.showCustomerPurchases(id);
     }
-
+    @PreAuthorize("hasAuthority('CUSTOMER') and #id==authentication.principal.id")
+    @PostMapping("{id}/update-image")
+    public void updateCustomerImage(@PathVariable Long id,@RequestBody ImageDto image){
+        customerServices.updateCustomerImage(id,image);
+    }
 
 
 }

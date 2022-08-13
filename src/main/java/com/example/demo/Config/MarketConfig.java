@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo){
         return args -> {
             Privilege seller_read=new Privilege("SELLER_READ");
             Privilege seller_write=new Privilege("SELLER_WRITE");
@@ -41,7 +41,7 @@ public class MarketConfig {
 
 
 
-            User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole));
+            User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole),"mohammadDerbasPic");
             PasswordEncoder passwordEncoder=new PasswordEncoder();
             String encoded=passwordEncoder.bCryptPasswordEncoder().encode(admin.getPassword());
             admin.setPassword(encoded);
@@ -71,15 +71,27 @@ public class MarketConfig {
 
             Product product=new Product("Cotton T-shirt",30,  0.50);
             Product product2=new Product("Cotton Trouser",100,.100);
+            List<Size>mix1=new ArrayList<>();
+            List<Size>mix2=new ArrayList<>();
+
+            mix1.add(x_large);
+            mix1.add(small);
+            mix1.add(xx_large);
+            mix2.add(small);
+
+
+
+
 
             man_clothes.addProduct(product);
             woman_clothes.addProduct(product2);
             categoryRepo.saveAll(List.of(man_clothes,woman_clothes,baby_clothes));
 
-
-            medium.addProduct(product);
-            small.addProduct(product2);
+            mix1.stream().forEach(size -> size.addProduct(product));
+            mix2.stream().forEach(size -> size.addProduct(product2));
             sizeRepo.saveAll(List.of(medium,small,large,x_large,xx_large));
+            System.out.println(x_large.getProducts());
+            System.out.println("888888888888888888888");
             t_shirt.addProduct(product);
             jeans.addProduct(product2);
             typeRepo.saveAll(List.of(t_shirt,dress,shorts,sweater,jeans));
@@ -88,9 +100,53 @@ public class MarketConfig {
             brandRepo.saveAll(List.of(lacoste,hugo_boss));
 
             product.buy();
-            Product product1=new Product("white dress",20,2.0,small,dress,lacoste,woman_clothes);
+            Product product1=new Product("white dress",20,2.0,List.of(small,large,medium),dress,lacoste,woman_clothes);
             productRepo.saveAll(List.of(product,product1,product2));
 
+            ColorProps colorProps1=new ColorProps("Blue");
+            colorProps1.setProduct(product);
+            ColorProps colorProps2=new ColorProps("Red");
+            colorProps2.setProduct(product);
+            ColorProps colorProps3=new ColorProps("Blue");
+            colorProps3.setProduct(product2);
+            ColorProps colorProps4=new ColorProps("Red");
+            colorProps4.setProduct(product2);
+            ColorProps colorProps5=new ColorProps("Red");
+            colorProps5.setProduct(product1);
+            ColorProps colorProps6=new ColorProps("Green");
+            colorProps6.setProduct(product1);
+
+            ColorProps colorProps7=new ColorProps("Yellow");
+            colorProps7.setProduct(product1);
+
+            colorPropsRepo.saveAll(List.of(colorProps1,colorProps2,colorProps3,colorProps4,colorProps5,colorProps6,colorProps7));
+            Images images1=new Images("p1imgBlue1");
+            images1.setColorProps(colorProps1);
+            Images images2=new Images("p1imgBlue2");
+            images2.setColorProps(colorProps1);
+            Images images3=new Images("p1imgRed1");
+            images3.setColorProps(colorProps2);
+            Images images4=new Images("p1imgRed2");
+            images4.setColorProps(colorProps2);
+
+            Images images5=new Images("p2imgBlue1");
+            images5.setColorProps(colorProps3);
+            Images images6=new Images("p2imgBlue2");
+            images6.setColorProps(colorProps3);
+            Images images7=new Images("p2imgRed1");
+            images7.setColorProps(colorProps4);
+            Images images8=new Images("p2imgRed2");
+            images8.setColorProps(colorProps4);
+
+            Images images9=new Images("pimgRed1");
+            images9.setColorProps(colorProps5);
+            Images images10=new Images("pimgGreen1");
+            images10.setColorProps(colorProps6);
+            Images images11=new Images("pimgBlue1");
+            images11.setColorProps(colorProps7);
+
+
+            imagesRepo.saveAll(List.of(images1,images2,images3,images4,images5,images6,images7,images8,images9,images10,images11));
 
 
 
@@ -106,7 +162,7 @@ public class MarketConfig {
             User user=new Seller("Mohammad",
                     "Derbas","mhammad_o_m@hotmail.com",
                     "momo0598134316","AskarCamp",
-                    "0592215224","P4270413",List.of(sellerRole));
+                    "0592215224","P4270413",List.of(sellerRole),"MohammadDerbasPic");
             String encoded1=passwordEncoder.bCryptPasswordEncoder().encode(user.getPassword());
             user.setPassword(encoded1);
             user.setEnabled(true);
@@ -126,11 +182,11 @@ public class MarketConfig {
             User Mohammad=new Customer("Wajeeh",
                     "Salem","wajeehsalem@hotmail.com",
                     "momo654321","Jenin",
-                    "0598654321","P4270413",List.of(customerRole));
+                    "0598654321","P4270413",List.of(customerRole),"WajeehSaleemPic");
             String encoded2=passwordEncoder.bCryptPasswordEncoder().encode(Mohammad.getPassword());
             Mohammad.setPassword(encoded2);
             Mohammad.setEnabled(true);
-
+            Mohammad.like(product);
 
 
 

@@ -45,7 +45,8 @@ public class RegistrationServices {
                     request.getAddress(),
                     request.getPhone(),
                     request.getPostalCode(),
-                    Arrays.asList(role)
+                    Arrays.asList(role),
+                    request.getProfilePic()
             );
 
             memberShipRepo.findByType("No-MemberShip").addCustomer(popo);
@@ -69,7 +70,8 @@ public class RegistrationServices {
                     request.getAddress(),
                     request.getPhone(),
                     request.getPostalCode(),
-                    Arrays.asList(role)
+                    Arrays.asList(role),
+                    request.getProfilePic()
             );
             String token = userServices.signUpUser(
                     seller

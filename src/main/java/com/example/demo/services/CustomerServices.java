@@ -1,9 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.DTO.CommentDTO;
-import com.example.demo.DTO.CommentFromDto;
-import com.example.demo.DTO.CustomerProductDTO;
-import com.example.demo.DTO.CustomerProductPurchaseDTO;
+import com.example.demo.DTO.*;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
@@ -246,7 +243,7 @@ public class CustomerServices {
         customerProductDTO.setPhone(order.getCustomer().getPhone());
         customerProductDTO.setDescription(order.getProduct().getDescription());
         customerProductDTO.setBrand(order.getProduct().getBrand());
-        customerProductDTO.setSize(order.getProduct().getSize());
+        customerProductDTO.setSize(order.getProduct().getSizes());
         customerProductDTO.setProductId(order.getProduct().getId());
         customerProductDTO.setPrice(order.getProduct().getPrice());
         customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));
@@ -273,5 +270,12 @@ public class CustomerServices {
     }
 
 
-
+    public void updateCustomerImage(Long id, ImageDto image) {
+        boolean exist=customerRepo.existsById(id);
+        if (!exist) {
+            throw new ApiRequestException("customer with id" + id + "does not exist");
+        }
+        Optional<Customer> user=customerRepo.findUserByID(id);
+        userRepo.updateUserImage(image.getImage());
+    }
 }

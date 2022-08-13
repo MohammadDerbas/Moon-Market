@@ -40,6 +40,8 @@ public class Product {
     LocalDate localDate=LocalDate.now();
 @Column(name = "date",insertable = false,columnDefinition = "Date DEFAULT CURRENT_DATE")
     private Date date;
+    @ManyToMany(mappedBy = "likedProduct")
+    List<Customer> likes;
     public Product() {
     }
 
@@ -50,11 +52,24 @@ public class Product {
         this.numberOfProductPurchaised=0;
     }
 
-    public Product(String description, Integer quantity, Double price, Size size, Type type, Brand brand, Category category) {
+    public Product(String description, Integer quantity, Double price, List<Size> sizes,List<ColorProps> colorProps, Type type, Brand brand, Category category) {
         this.description = description;
         this.quantity = quantity;
         this.price = price;
-        this.size = size;
+        this.sizes = sizes;
+        this.colorProps = colorProps;
+        this.type = type;
+        this.brand = brand;
+        this.category = category;
+        this.numberOfProductPurchaised=0;
+
+    }
+
+    public Product(String description, Integer quantity, Double price, List<Size> sizes, Type type, Brand brand, Category category) {
+        this.description = description;
+        this.quantity = quantity;
+        this.price = price;
+        this.sizes = sizes;
         this.type = type;
         this.brand = brand;
         this.category = category;
@@ -94,16 +109,29 @@ public class Product {
     public void setPrice(Double price) {
         this.price = price;
     }
-    @ManyToOne
-    @JoinColumn(
+    @ManyToMany(
+    )
+    @JoinTable(
             name = "product_size_id",
-            referencedColumnName = "id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "product_size_id")
+            joinColumns = @JoinColumn(
+                    name = "product_id",
+                    foreignKey = @ForeignKey(name="product_size_id_fk")
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name="size_id",
+                    foreignKey = @ForeignKey(name = "size_product_id")
+
+            )
+
 
     )
     @JsonView(View.View2.class)
-    private Size size;
+    private List<Size> sizes=new ArrayList<>();
+ @OneToMany(
+         mappedBy = "product"
+ )
+    @JsonView(View.View2.class)
+    private List<ColorProps> colorProps;
     @ManyToOne
     @JoinColumn(
             name = "product_type_id",
@@ -200,12 +228,34 @@ public class Product {
         this.type = type;
     }
 
-    public Size getSize() {
-        return size;
+    public List<Size> getSizes() {
+        return sizes;
     }
 
-    public void setSize(Size size) {
-        this.size = size;
+    public void setSizes(List<Size> sizes) {
+        this.sizes = sizes;
+    }
+
+    public void addSize(Size size) {
+
+            sizes.add(size);
+            System.out.println(sizes + "2222222222222222222222222");
+            // size.addProduct(this);
+
+    }
+    public void addSizeB(Size size) {
+
+        //sizes.add(size);
+        System.out.println(sizes + "5555555555555555555");
+        // size.addProduct(this);
+
+    }
+
+    public void removeSize(Size size){
+        if(sizes.contains(size)){
+            sizes.remove(size);
+            size.setProducts(null);
+        }
     }
 
     public Category getCategory() {
@@ -224,6 +274,13 @@ public class Product {
         this.carts = carts;
     }
 
+    public List<ColorProps> getColorProps() {
+        return colorProps;
+    }
+
+    public void setColorProps(List<ColorProps> colorProps) {
+        this.colorProps = colorProps;
+    }
 
     public void buy(){
 

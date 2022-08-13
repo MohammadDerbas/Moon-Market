@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entity.Product;
+import com.example.demo.entity.Size;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.SizeRepo;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,11 @@ public class SizeServices {
     public SizeServices(SizeRepo sizeRepo) {
         this.sizeRepo = sizeRepo;
     }
-    public List<Product> findProductsBySize(String size){
-        boolean exists=sizeRepo.existsBySize(size);
+    public List<Product> findProductsBySize(List <String> size){
+        boolean exists=sizeRepo.existsBySizeIn(size);
         if(!exists){
             throw new ApiRequestException("Size "+size+" does not exists");
         }
-        return sizeRepo.findProductsBySize(size);
+        return sizeRepo.findProductsBySizeIn(size);
     }
 }

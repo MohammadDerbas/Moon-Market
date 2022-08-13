@@ -42,7 +42,7 @@ public class PurchaseServices {
         customerProductPurchaseDTO.setQuantity(purchase.getQuantity());
         customerProductPurchaseDTO.setPrice(purchase.getPrice());
         customerProductPurchaseDTO.setDescription(product.getDescription());
-        customerProductPurchaseDTO.setSize(product.getSize());
+        customerProductPurchaseDTO.setSize(product.getSizes());
         customerProductPurchaseDTO.setBrand(product.getBrand());
         return customerProductPurchaseDTO;
 

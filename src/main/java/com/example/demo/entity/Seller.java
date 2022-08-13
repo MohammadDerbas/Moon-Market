@@ -52,8 +52,8 @@ public class Seller extends User{
 
     public Seller() {}
 
-    public Seller(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
-        super( firstName, lastName, email, password, address, phone, postalCode,roles);
+    public Seller(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles,String profilePic) {
+        super( firstName, lastName, email, password, address, phone, postalCode,roles,profilePic);
         this.reportCounter = 0;
         this.star = 0;
         this.activate = true;

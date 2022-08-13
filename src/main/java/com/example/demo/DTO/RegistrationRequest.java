@@ -10,11 +10,12 @@ public class RegistrationRequest {
     private final String address;
     private final String phone;
     private final String postalCode;
+    private final String profilePic;
     private final Boolean isCustomer;
     private final Boolean isSeller;
 
 
-    public RegistrationRequest(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Boolean isCustomer, Boolean isSeller) {
+    public RegistrationRequest(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Boolean isCustomer, Boolean isSeller, String profilePic) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -24,6 +25,11 @@ public class RegistrationRequest {
         this.postalCode = postalCode;
         this.isCustomer = isCustomer;
         this.isSeller = isSeller;
+        this.profilePic = profilePic;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
     }
 
     public String getFirstName() {
@@ -67,11 +73,13 @@ public class RegistrationRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegistrationRequest that = (RegistrationRequest) o;
-        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(address, that.address) && Objects.equals(phone, that.phone) && Objects.equals(postalCode, that.postalCode) && Objects.equals(isCustomer, that.isCustomer) && Objects.equals(isSeller, that.isSeller);
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(address, that.address) && Objects.equals(phone, that.phone) && Objects.equals(postalCode, that.postalCode) && Objects.equals(profilePic, that.profilePic) && Objects.equals(isCustomer, that.isCustomer) && Objects.equals(isSeller, that.isSeller);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, email, password, address, phone, postalCode, isCustomer, isSeller);
+        return Objects.hash(firstName, lastName, email, password, address, phone, postalCode, profilePic, isCustomer, isSeller);
     }
 }
+
+

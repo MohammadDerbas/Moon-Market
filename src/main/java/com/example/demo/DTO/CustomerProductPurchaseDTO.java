@@ -5,13 +5,14 @@ import com.example.demo.entity.Size;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public class CustomerProductPurchaseDTO {
     private String name;
     private String type;
     private String description;
     private Brand brand;
-    private Size size;
+    private List<Size> size;
     private LocalDate date;
     private Integer quantity;
     private Double price;
@@ -19,7 +20,7 @@ public class CustomerProductPurchaseDTO {
     public CustomerProductPurchaseDTO() {
     }
 
-    public CustomerProductPurchaseDTO(String name, String type, String description, Brand brand, Size size, LocalDate date, Integer quantity, Double price) {
+    public CustomerProductPurchaseDTO(String name, String type, String description, Brand brand, List<Size> size, LocalDate date, Integer quantity, Double price) {
         this.name = name;
         this.type = type;
         this.description = description;
@@ -62,11 +63,11 @@ public class CustomerProductPurchaseDTO {
         this.brand = brand;
     }
 
-    public Size getSize() {
+    public List<Size> getSize() {
         return size;
     }
 
-    public void setSize(Size size) {
+    public void setSize(List<Size> size) {
         this.size = size;
     }
 

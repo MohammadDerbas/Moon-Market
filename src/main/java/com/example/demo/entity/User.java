@@ -4,6 +4,7 @@ package com.example.demo.entity;
 
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,10 +32,15 @@ public class User implements UserDetails {
 
     private Long id;
 
+    @JsonView({View.View1.class, View.View3.class})
+    private String profilePic;
+
+
     @Column(
             name="first_name",
             nullable = false
     )
+
     @JsonView({View.View1.class, View.View3.class})
 
     private String firstName;
@@ -108,7 +114,7 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles) {
+    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles,String profilePic) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -117,6 +123,7 @@ public class User implements UserDetails {
         this.phone = phone;
         this.postalCode = postalCode;
         this.roles=roles;
+        this.profilePic=profilePic;
 
 
     }
@@ -272,7 +279,24 @@ public class User implements UserDetails {
 
     }
 
+    public void like(Product product){
 
+
+    }
+    public void removeLike(@NotNull Product product){
+
+
+        }
+
+
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
 
     @Override
     public String toString() {

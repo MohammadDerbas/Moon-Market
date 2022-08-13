@@ -3,6 +3,8 @@ package com.example.demo.DTO;
 import com.example.demo.entity.Brand;
 import com.example.demo.entity.Size;
 
+import java.util.List;
+
 public class CustomerProductDTO {
 private Long userId;
 private String firstName;
@@ -13,13 +15,13 @@ private String phone;
 private Long productId;
 private String description;
 private Brand brand;
-private Size size;
+private List<Size> size;
 private Double price;
 private Integer quantityOrder;
     public CustomerProductDTO() {
     }
 
-    public CustomerProductDTO(Long userId, String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, Size size, Double price, Integer quantityOrder) {
+    public CustomerProductDTO(Long userId, String firstName, String lastName, String address, String postalCode, String phone, Long productId, String description, Brand brand, List<Size> size, Double price, Integer quantityOrder) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -118,11 +120,11 @@ private Integer quantityOrder;
         this.brand = brand;
     }
 
-    public Size getSize() {
+    public List<Size> getSize() {
         return size;
     }
 
-    public void setSize(Size size) {
+    public void setSize(List<Size> size) {
         this.size = size;
     }
 

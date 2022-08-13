@@ -7,10 +7,7 @@ import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,6 +30,19 @@ public class ProductController {
 
     @GetMapping(path="/{id}/product-comments")
     public List<Product> showProductComments(@PathVariable Long id) {
+
         return customerServices.showProductComment(id);
     }
+    @JsonView(View.View2.class)
+    @GetMapping
+    public List <Product> filterProduct(@RequestParam(required = false)String categoury,
+                                        @RequestParam(required = false)String color,
+                                        @RequestParam(required = false)List<String> size,
+                                        @RequestParam(required = false)String type,
+                                        @RequestParam(required = false)String brand,
+                                        @RequestParam (required = false)Integer s,
+                                        @RequestParam(required = false)Integer e){
+    return productServices.filter(categoury,color,size,type,brand,s,e);
+    }
 }
+

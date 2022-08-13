@@ -11,11 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface SizeRepo extends JpaRepository<Size,Long> {
-    @Query("select (count(s) > 0) from Size s where s.size = ?1")
-    boolean existsBySize(String size);
+    @Query("select (count(s) > 0) from Size s where s.size in ?1")
+    boolean existsBySizeIn(List<String>sizes);
 
-    @Query("select s from Size s where s.size = ?1")
-    Size findBySize(String size);
-    @Query("select s.products from Size s where s.size=?1")
-    List<Product> findProductsBySize(String size);
+    @Query("select s from Size s where s.size in ?1")
+    List<Size> findBySize(List<String>sizes);
+    @Query("select s.products from Size s where s.size in ?1")
+    List<Product> findProductsBySizeIn(List<String>sizes);
 }

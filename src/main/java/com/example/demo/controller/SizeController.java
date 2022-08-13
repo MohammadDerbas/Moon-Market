@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Product;
+import com.example.demo.entity.Size;
 import com.example.demo.services.SizeServices;
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -21,7 +22,7 @@ public class SizeController {
     }
     @GetMapping("/{size}")
     @JsonView(View.View2.class)
-    public List<Product> findProductsBySize(@PathVariable String size){
+    public List<Product> findProductsBySize(@PathVariable List<String> size){
         return sizeServices.findProductsBySize(size);
     }
 }

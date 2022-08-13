@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.ColorPropsDTO;
 import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DTO.CommentFromDto;
+import com.example.demo.DTO.ImageDto;
 import com.example.demo.entity.*;
 import com.example.demo.repo.UserRepo;
 import com.example.demo.services.SellerServices;
@@ -71,12 +73,28 @@ public class SellerController {
                                           @RequestParam(required = false) String description,
                                           @RequestParam(required = false) Integer quantity,
                                           @RequestParam(required = false) Double price,
-                                          @RequestParam(required = false) String size,
+                                          @RequestParam(required = false) List<String> size,
                                           @RequestParam(required = false) String type,
                                           @RequestParam(required = false) String brand,
-                                          @RequestParam(required = false) String category) {
+                                          @RequestParam(required = false) String category
+                                          ) {
         sellerServices.updateSellerProductWithId(id, id2, description, quantity,
-                price, size, type, brand, category);
+                price,  size, type, brand, category);
+    }
+    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
+    @PostMapping("{id}/product/{id2}/delete-image")
+    public void deleteSellerImageProductWithId(@PathVariable Long id,@PathVariable Long id2 ,@RequestBody ColorPropsDTO colorPropsDTO){
+        sellerServices.deleteSellerImageProductWithId(id,id2,colorPropsDTO);
+    }
+    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
+    @PostMapping("{id}/product/{id2}/add-image")
+    public void addSellerImageProductWithId(@PathVariable Long id,@PathVariable Long id2 ,@RequestBody ColorPropsDTO colorPropsDTO){
+        sellerServices.addSellerImageProductWithId(id,id2,colorPropsDTO);
+    }
+    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
+    @PostMapping("{id}/update-image")
+    public void updateSellerImage(@PathVariable Long id,@RequestBody ImageDto image){
+        sellerServices.updateSellerImage(id,image);
     }
 
     @GetMapping("/")

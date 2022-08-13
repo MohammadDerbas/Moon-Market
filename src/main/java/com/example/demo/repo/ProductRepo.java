@@ -27,4 +27,6 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
             "update Product p set p.quantity=?1 where p.id=?2"
     )
     void updateQuantity(Integer newQuantity,Long id);
+    @Query("select p from Product p where p.category.category = ?1")
+    List<Product> findProductByCategory(String category);
 }

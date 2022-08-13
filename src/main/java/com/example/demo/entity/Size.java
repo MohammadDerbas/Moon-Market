@@ -30,11 +30,8 @@ public class Size {
     public String getSize() {
         return size;
     }
-    @OneToMany(
-    mappedBy = "size",
-            orphanRemoval = true,
-           // cascade = {CascadeType.PERSIST,CascadeType.REMOVE},
-            fetch = FetchType.LAZY
+    @ManyToMany(
+            mappedBy = "sizes"
 
     )
     @JsonIgnore
@@ -48,17 +45,24 @@ public class Size {
         this.products = products;
     }
     public void addProduct(Product product){
-        if(!products.contains(product)){
             products.add(product);
-            product.setSize(this);
-        }
+            products.get(products.size()-1).addSize(this);
+
     }
-    public void removeProduct(Product product){
+    public void addProductB(Product product){
+            products.add(product);
+
+            product.addSize(this);
+            System.out.println(product.getSizes()+"333333333333333333333333");
+
+    }
+   /* public void removeProduct(Product product){
         if(products.contains(product)){
             products.remove(product);
             product.setSize(null);
         }
-    }
+    }*/
+
 
     @Override
     public String toString() {

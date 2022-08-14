@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.ColorPropsDTO;
+import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DTO.CommentFromDto;
 import com.example.demo.DTO.ImageDto;
 import com.example.demo.entity.*;
@@ -33,8 +34,9 @@ public class SellerServices {
     private final ImagesRepo imagesRepo;
     private final CustomerRepo customerRepo;
     private final LikeRepo likeRepo;
+    private final ProductCommentRepo productCommentRepo;
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -49,9 +51,10 @@ public class SellerServices {
         this.imagesRepo = imagesRepo;
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
+        this.productCommentRepo = productCommentRepo;
     }
 
-    public Product getInfoSellerProductWithId(Long id, Long id2,Boolean like,String email) {
+    public Product getInfoSellerProductWithId(Long id, Long id2,Boolean like,CommentDTO commentDTO,Long deleteComment,String email) {
         boolean exists = sellerRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
@@ -60,8 +63,22 @@ public class SellerServices {
         if (!productExists) {
             throw new ApiRequestException("Product with id " + id2 + "does not exist");
         }
+        long id3 = userRepo.findUserByEmail(email).get().getId();
+        boolean exist2 = customerRepo.existsById(id3);
+        if (!exist2) {
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+        }
+
+        Product product=productRepo.findProductById(id2);
+        Customer customer=customerRepo.findUserByID(id3).get();
         if(like!=null) {
-            Long id3 = customerRepo.findUserByEmail(email).get().getId();
+            if(commentDTO!=null){
+                throw new ApiRequestException("you try to like and comment in the same time");
+            }
+            if(deleteComment!=null){
+                throw new ApiRequestException("you try to like and delete comment in the same time");
+
+            }
             Like like1 = new Like(new LikeId(id3, id2), customerRepo.findUserByID(id3).get(), productRepo.findProductById(id2));
             if (like) {
                 likeRepo.save(like1);
@@ -70,10 +87,30 @@ public class SellerServices {
                 likeRepo.delete(like1);
             }
         }
+        else {
+            if (commentDTO != null) {
+                if (deleteComment != null) {
+                    throw new ApiRequestException("you try to add comment and delete comment in the same time");
+                }
+                String productComments = commentDTO.getComment();
+                ProductComment productComment = new ProductComment(productComments);
+                productComment.setProduct(product);
+                productComment.setCustomer(customer);
+                productCommentRepo.save(productComment);
+            } else {
+                if (deleteComment != null) {
+                    if (!productCommentRepo.existsById(deleteComment, email)) {
+                        throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+
+                    }
+                    productCommentRepo.deleteById(deleteComment);
+                }
+            }
+        }
         return productRepo.getReferenceById(id2);
     }
 
-    public Optional<Seller> getSeller(Long id,Boolean follow,String email) {
+    public Optional<Seller> getSeller(Long id,Boolean follow,String email,CommentDTO commentDTO,Long deleteComment) {
         boolean exists = sellerRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
@@ -86,6 +123,13 @@ public class SellerServices {
         }
         Customer customer= (Customer) customerRepo.findUserByEmail(email).get();
         if(follow!=null){
+            if(commentDTO!=null){
+                throw new ApiRequestException("you try to follow and comment in the same time");
+            }
+            if(deleteComment!=null){
+                throw new ApiRequestException("you try to follow and delete comment in the same time");
+
+            }
             Followers followers=new Followers(new FollowersId(customer.getId(),id),customer,seller.get());
             if(follow){
                 followRepo.save(followers);
@@ -97,6 +141,28 @@ public class SellerServices {
                 }
                 else{
                     followRepo.delete(followers);
+                }
+            }
+
+
+        }
+        else {
+            if (commentDTO != null) {
+                if (deleteComment != null) {
+                    throw new ApiRequestException("you try to add comment and delete comment in the same time");
+                }
+                String sellerComments = commentDTO.getComment();
+                SellerComment sellerComment = new SellerComment(sellerComments);
+                sellerComment.setSeller(seller.get());
+                sellerComment.setCustomer(customer);
+                sellerCommentRepo.save(sellerComment);
+            } else {
+                if (deleteComment != null) {
+                    if (!sellerCommentRepo.existsById(deleteComment, email)) {
+                        throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+
+                    }
+                    sellerCommentRepo.deleteById(deleteComment);
                 }
             }
         }
@@ -196,7 +262,7 @@ public class SellerServices {
         storeHouseRepo.save(op);
     }
 
-    public List<Product> showProduct(Long id,Long productId,Boolean like,String email) {
+    public List<Product> showProduct(Long id,Long productId,Boolean like,CommentDTO commentDTO,Long deleteComment,String email) {
         if (productId != null) {
             boolean exist = productRepo.existsById(productId);
             if (!exist) {
@@ -210,7 +276,16 @@ public class SellerServices {
             throw new ApiRequestException("He  is not a customer try with customer id ");
 
         }
+        Product product=productRepo.findProductById(productId);
+        Customer customer=customerRepo.findUserByID(id2).get();
         if (like != null) {
+            if(commentDTO!=null){
+                throw new ApiRequestException("you try to like and comment in the same time");
+            }
+            if(deleteComment!=null){
+                throw new ApiRequestException("you try to like and delete comment in the same time");
+
+            }
             Like like1 = new Like(new LikeId(id2, productId), customerRepo.findUserByID(id2).get(), productRepo.findProductById(productId));
             if (like) {
                 likeRepo.save(like1);
@@ -222,37 +297,93 @@ public class SellerServices {
                 likeRepo.delete(like1);
 
             }
+
+        }
+        else {
+            if (commentDTO != null) {
+                if (deleteComment != null) {
+                    throw new ApiRequestException("you try to add comment and delete comment in the same time");
+                }
+                String productComments = commentDTO.getComment();
+                ProductComment productComment = new ProductComment(productComments);
+                productComment.setProduct(product);
+                productComment.setCustomer(customer);
+                productCommentRepo.save(productComment);
+            } else {
+                if (deleteComment != null) {
+                    if (!productCommentRepo.existsById(deleteComment, email)) {
+                        throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+
+                    }
+                    productCommentRepo.deleteById(deleteComment);
+                }
+            }
         }
         return productRepo.showProductWithSpecificSeller(id);
 
     }
 
-    public List<User> showSellers(Long sellerId,Boolean follow,String email) {
-
-        boolean exists = sellerRepo.existsById(sellerId);
-        if (!exists) {
-            throw new ApiRequestException("Seller with id " + sellerId + "does not exist");
-        }
-        Optional<Seller> seller = sellerRepo.findUserById(sellerId);
-        boolean exist1=customerRepo.existsByEmail(email);
-        if(!exist1){
-            throw new ApiRequestException("He is not a customer try to enter with a customer account");
-
-        }
-        Customer customer= (Customer) customerRepo.findUserByEmail(email).get();
-        if(follow!=null){
-            Followers followers=new Followers(new FollowersId(customer.getId(),sellerId),customer,seller.get());
-            if(follow){
-                followRepo.save(followers);
+    public List<User> showSellers(Long sellerId, Boolean follow, String email, CommentDTO commentDTO,Long deleteComment) {
+        if(sellerId!=null) {
+            boolean exists = sellerRepo.existsById(sellerId);
+            if (!exists) {
+                throw new ApiRequestException("Seller with id " + sellerId + "does not exist");
             }
-            else{
-                if(!followRepo.isCustmoerFollowSeller(customer.getId(),sellerId)){
-                    throw new ApiRequestException("customer with id "+customer.getId()+"did not follow seller with id"+sellerId);
+            Optional<Seller> seller = sellerRepo.findUserById(sellerId);
+
+            boolean exist1 = customerRepo.existsByEmail(email);
+            if (!exist1) {
+                throw new ApiRequestException("He is not a customer try to enter with a customer account");
+
+            }
+            Customer customer = (Customer) customerRepo.findUserByEmail(email).get();
+            if (follow != null) {
+                if(commentDTO!=null){
+                    throw new ApiRequestException("you try to follow and comment in the same time");
+                }
+                if(deleteComment!=null){
+                    throw new ApiRequestException("you try to follow and delete comment in the same time");
 
                 }
-                else{
-                    followRepo.delete(followers);
+                Followers followers = new Followers(new FollowersId(customer.getId(), sellerId), customer, seller.get());
+                if (follow) {
+                    followRepo.save(followers);
+                } else {
+                    if (!followRepo.isCustmoerFollowSeller(customer.getId(), sellerId)) {
+                        throw new ApiRequestException("customer with id " + customer.getId() + "did not follow seller with id" + sellerId);
+
+                    } else {
+                        followRepo.delete(followers);
+                    }
                 }
+            } else {
+                if (commentDTO != null) {
+                    if (deleteComment != null) {
+                        throw new ApiRequestException("you try to add comment and delete comment in the same time");
+                    }
+                    String sellerComments = commentDTO.getComment();
+                    SellerComment sellerComment = new SellerComment(sellerComments);
+                    sellerComment.setSeller(seller.get());
+                    sellerComment.setCustomer(customer);
+                    sellerCommentRepo.save(sellerComment);
+                } else {
+                    if (deleteComment != null) {
+                        if (!sellerCommentRepo.existsById(deleteComment, email)) {
+
+                            throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+                        }
+                        sellerCommentRepo.deleteById(deleteComment);
+                    }
+                }
+            }
+        }
+        else{
+            if(follow!=null){
+                throw new ApiRequestException("you try to follow without select seller");
+            }
+            if(commentDTO!=null){
+                throw new ApiRequestException("you try to comment without select seller");
+
             }
         }
         List<User> sellers = sellerRepo.findAll();
@@ -375,6 +506,8 @@ public class SellerServices {
         CommentFromDto dto=new CommentFromDto();
         dto.setComment(sellerComment.getComment());
         dto.setFrom(sellerComment.getCustomer().getFirstName()+" "+sellerComment.getCustomer().getLastName());
+        dto.setId(sellerComment.getId());
+        dto.setTime(sellerComment.getTime());
         return dto;
     }
 

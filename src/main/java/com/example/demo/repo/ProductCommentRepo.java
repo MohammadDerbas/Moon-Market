@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface ProductCommentRepo extends JpaRepository <ProductComment,Long>  {
-    @Query("SELECT c.comment FROM ProductComment c where c.product.id=?1")
+    @Query("SELECT c FROM ProductComment c where c.product.id=?1")
     List<ProductComment> findAllProductCommentByProductId(Long id);
+    @Query("select (count(s) > 0) from ProductComment s where s.id = ?1 and s.customer.email=?2")
+    boolean existsById(Long id,String email);
 }

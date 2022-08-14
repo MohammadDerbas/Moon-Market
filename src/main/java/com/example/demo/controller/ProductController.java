@@ -1,11 +1,13 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.CommentDTO;
 import com.example.demo.entity.Product;
 import com.example.demo.services.CustomerServices;
 import com.example.demo.services.ProductServices;
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +26,8 @@ public class ProductController {
     }
     @GetMapping("/")
     @JsonView(View.View2.class)
-    List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, Principal principal){
-        return productServices.listProduct(productId,like,principal.getName());
+    List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, @RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false) Long deleteComment,Principal principal){
+        return productServices.listProduct(productId,like,commentDTO,deleteComment,principal.getName());
 
     }
 
@@ -34,7 +36,7 @@ public class ProductController {
 
         return customerServices.showProductComment(id);
     }
-    @JsonView(View.View2.class)
+  /*  @JsonView(View.View2.class)
     @GetMapping
     public List <Product> filterProduct(@RequestParam(required = false)String categoury,
                                         @RequestParam(required = false)String color,
@@ -42,8 +44,14 @@ public class ProductController {
                                         @RequestParam(required = false)String type,
                                         @RequestParam(required = false)String brand,
                                         @RequestParam (required = false)Integer s,
-                                        @RequestParam(required = false)Integer e){
+                                        @RequestParam(required = false)Integer e
+                                        ){
     return productServices.filter(categoury,color,size,type,brand,s,e);
+    }*/
+
+    @GetMapping()
+    public Integer numberOfLikesOnProduct(@RequestParam(required = false)Long productId){
+        return productServices.numberOfLikesOnProduct(productId);
     }
 }
 

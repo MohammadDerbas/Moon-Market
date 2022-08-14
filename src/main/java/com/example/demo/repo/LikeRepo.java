@@ -22,4 +22,7 @@ public interface LikeRepo extends JpaRepository<Like, LikeId> {
     void deleteById(FollowersId followersId);
     @Query("SELECT (count(c)>0) from ProductLike c where c.customer.id=?1 and c.product.id=?2")
     Boolean isCustmoerLikeProduct(Long id,Long id2);
+
+    @Query("select count(p) from ProductLike p where p.product.id = ?1")
+    Integer countLikeByProductId(Long productId);
 }

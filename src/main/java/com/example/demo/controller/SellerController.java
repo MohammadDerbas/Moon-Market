@@ -35,9 +35,9 @@ public class SellerController {
 
     @GetMapping("/{id}/info")
     @JsonView(View.View1.class)
-    public Optional<Seller> infoSeller(@PathVariable("id") Long id,@RequestParam(required = false) Boolean follow,Principal principal) {
+    public Optional<Seller> infoSeller(@PathVariable("id") Long id,@RequestParam(required = false) Boolean follow,Principal principal,@RequestBody(required = false)CommentDTO commentDTO,Long deleteComment) {
 
-        return sellerServices.getSeller(id,follow,principal.getName());
+        return sellerServices.getSeller(id,follow,principal.getName(),commentDTO,deleteComment);
     }
 
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
@@ -61,14 +61,14 @@ public class SellerController {
 
     @GetMapping("{id}/product")
     @JsonView(View.View2.class)
-    public List<Product> showProduct(@PathVariable Long id, @RequestParam (required = false)Long productId,@RequestParam(required = false) Boolean like,Principal principal) {
-        return sellerServices.showProduct(id,productId,like,principal.getName());
+    public List<Product> showProduct(@PathVariable Long id, @RequestParam (required = false)Long productId,@RequestParam(required = false) Boolean like,@RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false)Long deleteComment,Principal principal) {
+        return sellerServices.showProduct(id,productId,like,commentDTO,deleteComment,principal.getName());
     }
 
     @GetMapping("{id}/product/{id2}")
     @JsonView(View.View2.class)
-    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = false) Boolean like,Principal principal) {
-        return sellerServices.getInfoSellerProductWithId(id, id2,like,principal.getName());
+    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = false) Boolean like,@RequestBody(required = false) CommentDTO commentDTO,Long deleteComment,Principal principal) {
+        return sellerServices.getInfoSellerProductWithId(id, id2,like,commentDTO,deleteComment,principal.getName());
 
     }
 
@@ -104,9 +104,9 @@ public class SellerController {
 
     @GetMapping("/")
     @JsonView(View.View1.class)
-    public List<User> sellers(@RequestParam(required = false)Long sellerId,@RequestParam(required = false) Boolean follow,Principal principal) {
+    public List<User> sellers(@RequestParam(required = false)Long sellerId,@RequestParam(required = false) Boolean follow,Principal principal,@RequestBody(required = false)CommentDTO commentDTO,Long deleteComment) {
 
-        return sellerServices.showSellers(sellerId,follow,principal.getName());
+        return sellerServices.showSellers(sellerId,follow,principal.getName(),commentDTO,deleteComment );
     }
    /* @GetMapping("/")
     public String sellers() {

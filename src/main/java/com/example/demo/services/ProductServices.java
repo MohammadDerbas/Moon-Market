@@ -1,15 +1,11 @@
 package com.example.demo.services;
 
-import com.example.demo.entity.Like;
-import com.example.demo.entity.LikeId;
-import com.example.demo.entity.Product;
-import com.example.demo.entity.Size;
+import com.example.demo.DTO.CommentDTO;
+import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
-import com.example.demo.repo.CustomerRepo;
-import com.example.demo.repo.LikeRepo;
-import com.example.demo.repo.ProductRepo;
-import com.example.demo.repo.UserRepo;
+import com.example.demo.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,14 +19,16 @@ public class ProductServices {
     private final CustomerRepo customerRepo;
     private final LikeRepo likeRepo;
     private final UserRepo userRepo;
+    private final ProductCommentRepo productCommentRepo;
     @Autowired
-    public ProductServices(ProductRepo productRepo, CustomerRepo customerRepo, LikeRepo likeRepo, UserRepo userRepo) {
+    public ProductServices(ProductRepo productRepo, CustomerRepo customerRepo, LikeRepo likeRepo, UserRepo userRepo, ProductCommentRepo productCommentRepo) {
         this.productRepo = productRepo;
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
         this.userRepo = userRepo;
+        this.productCommentRepo = productCommentRepo;
     }
-    public List<Product> listProduct(Long productId,Boolean like,String email) {
+    public List<Product> listProduct(Long productId, Boolean like, CommentDTO commentDTO,Long deleteComment, String email) {
         if(productId!=null){
             boolean exist=productRepo.existsById(productId);
             if(!exist){
@@ -48,7 +46,16 @@ public class ProductServices {
             throw new ApiRequestException("He  is not a customer try with customer id ");
 
         }
+        Product product=productRepo.findProductById(productId);
+        Customer customer=customerRepo.findUserByID(id).get();
         if(like!=null) {
+            if(commentDTO!=null){
+                throw new ApiRequestException("you try to like and comment in the same time");
+            }
+            if(deleteComment!=null){
+                throw new ApiRequestException("you try to like and delete comment in the same time");
+
+            }
             if (like) {
                 Long id3 = customerRepo.findUserByEmail(email).get().getId();
                 Like like1 = new Like(new LikeId(id3, productId), customerRepo.findUserByID(id3).get(), productRepo.findProductById(productId));
@@ -61,9 +68,28 @@ public class ProductServices {
                 likeRepo.deleteById(new LikeId(id, productId));
             }
         }
+        else {
+            if (commentDTO != null) {
+                if (deleteComment != null) {
+                    throw new ApiRequestException("you try to add comment and delete comment in the same time");
+                }
+                String productComments = commentDTO.getComment();
+                ProductComment productComment = new ProductComment(productComments);
+                productComment.setProduct(product);
+                productComment.setCustomer(customer);
+                productCommentRepo.save(productComment);
+            } else {
+                if (deleteComment != null) {
+                    if (!productCommentRepo.existsById(deleteComment, email)) {
+                        throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+
+                    }
+                    productCommentRepo.deleteById(deleteComment);
+                }
+            }
+        }
         return productRepo.findAll();
     }
-
 
     public List<Product> filter(String categoury, String color, List<String> size, String type, String brand,  Integer s, Integer e) {
         List<Product>filterProduct1=new ArrayList<>();
@@ -145,6 +171,12 @@ public class ProductServices {
 
         }
 
-
+    public Integer numberOfLikesOnProduct(Long productId) {
+        boolean exist=productRepo.existsById(productId);
+        if(!exist){
+            throw new ApiRequestException("product with id "+productId+"does not exist");
+        }
+        return likeRepo.countLikeByProductId(productId);
     }
+}
 

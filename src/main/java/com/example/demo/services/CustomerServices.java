@@ -192,7 +192,7 @@ public class CustomerServices {
             throw new ApiRequestException("product with id" + id + "does not exist");
         }
 
-        return  productCommentRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return  productCommentRepo.findAllProductCommentByProductId(id).stream().map(this::convertToDTO).collect(Collectors.toList());
 
 
     }
@@ -219,6 +219,8 @@ public class CustomerServices {
     private CommentFromDto convertToDTO(ProductComment productComment){
         CommentFromDto dto=new CommentFromDto();
         dto.setComment(productComment.getComment());
+        dto.setId(productComment.getId());
+        dto.setTime(productComment.getTime());
         dto.setFrom(productComment.getCustomer().getFirstName()+" "+productComment.getCustomer().getLastName());
         return dto;
     }

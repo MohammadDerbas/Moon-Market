@@ -14,4 +14,7 @@ public interface SellerCommentRepo extends JpaRepository<SellerComment,Long> {
 
     @Query("select s from SellerComment s where s.seller.id=?1")
     List<SellerComment> findAll(Long id);
+
+    @Query("select (count(s) > 0) from SellerComment s where s.id = ?1 and s.customer.email=?2")
+    boolean existsById(Long id,String email);
 }

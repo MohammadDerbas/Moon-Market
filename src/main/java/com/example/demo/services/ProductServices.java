@@ -178,5 +178,75 @@ public class ProductServices {
         }
         return likeRepo.countLikeByProductId(productId);
     }
+
+    public void addProductComment(Long productId, CommentDTO commentDTO, String name) {
+        boolean exist1 = productRepo.existsById(productId);
+        if (!exist1) {
+            throw new ApiRequestException("product with id" + productId + "does not exist");
+        }
+        long id2 = userRepo.findUserByEmail(name).get().getId();
+
+        boolean exist2 = customerRepo.existsById(id2);
+        if (!exist2) {
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+
+        }
+        Product product = productRepo.findProductById(productId);
+        Customer customer = customerRepo.findUserByID(id2).get();
+        String productComments = commentDTO.getComment();
+        ProductComment productComment = new ProductComment(productComments);
+        productComment.setProduct(product);
+        productComment.setCustomer(customer);
+        productCommentRepo.save(productComment);
+    }
+
+    public void addProductLike(Long productId, Boolean like, String name) {
+        boolean exist1 = productRepo.existsById(productId);
+        if (!exist1) {
+            throw new ApiRequestException("product with id" + productId + "does not exist");
+        }
+        long id2 = userRepo.findUserByEmail(name).get().getId();
+
+        boolean exist2 = customerRepo.existsById(id2);
+        if (!exist2) {
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+
+        }
+        Product product = productRepo.findProductById(productId);
+        Customer customer = customerRepo.findUserByID(id2).get();
+        Like like1 = new Like(new LikeId(id2, productId), customerRepo.findUserByID(id2).get(), productRepo.findProductById(productId));
+        if (like) {
+            likeRepo.save(like1);
+        } else {
+            if (!likeRepo.isCustmoerLikeProduct(id2, productId)) {
+                throw new ApiRequestException("customer with id +" + id2 + " did not like product with id" + productId);
+
+            }
+            likeRepo.delete(like1);
+
+
+        }
+    }
+
+    public void deleteProductComment(Long productId, Long deleteComment, String name) {
+        boolean exist1 = productRepo.existsById(productId);
+        if (!exist1) {
+            throw new ApiRequestException("product with id" + productId + "does not exist");
+        }
+        long id2 = userRepo.findUserByEmail(name).get().getId();
+
+        boolean exist2 = customerRepo.existsById(id2);
+        if (!exist2) {
+            throw new ApiRequestException("He  is not a customer try with customer id ");
+
+        }
+        Product product = productRepo.findProductById(productId);
+        Customer customer = customerRepo.findUserByID(id2).get();
+        if (!productCommentRepo.existsById(deleteComment, name)) {
+            throw new ApiRequestException("this comment with id" + deleteComment + "may not exist " + "or you can't delete it from this customer");
+
+        }
+        productCommentRepo.deleteById(deleteComment);
+    }
 }
 

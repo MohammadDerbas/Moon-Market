@@ -24,19 +24,32 @@ public class ProductController {
         this.productServices = productServices;
         this.customerServices = customerServices;
     }
-    @GetMapping("/")
+/*    @GetMapping("/")
     @JsonView(View.View2.class)
-    List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, @RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false) Long deleteComment,Principal principal){
+    public  List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, @RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false) Long deleteComment,Principal principal){
         return productServices.listProduct(productId,like,commentDTO,deleteComment,principal.getName());
 
+    }*/
+    @PostMapping()
+    public void addProductComment(@RequestParam(required = true) Long productId,  @RequestBody(required = true) CommentDTO commentDTO,Principal principal){
+        productServices.addProductComment(productId,commentDTO,principal.getName());
     }
+    @PutMapping()
+    public void addProductLike(@RequestParam(required = true) Long productId, @RequestParam(required = true)Boolean like ,Principal principal){
+        productServices.addProductLike(productId,like,principal.getName());
+    }
+    @DeleteMapping()
+    public void deleteProductComment(@RequestParam(required = true) Long productId,@RequestParam(required = true) Long deleteComment  ,Principal principal){
+        productServices.deleteProductComment(productId,deleteComment,principal.getName());
+    }
+
 
     @GetMapping(path="/{id}/product-comments")
     public List<Product> showProductComments(@PathVariable Long id) {
 
         return customerServices.showProductComment(id);
     }
-  /*  @JsonView(View.View2.class)
+    @JsonView(View.View2.class)
     @GetMapping
     public List <Product> filterProduct(@RequestParam(required = false)String categoury,
                                         @RequestParam(required = false)String color,
@@ -47,10 +60,10 @@ public class ProductController {
                                         @RequestParam(required = false)Integer e
                                         ){
     return productServices.filter(categoury,color,size,type,brand,s,e);
-    }*/
+    }
 
-    @GetMapping()
-    public Integer numberOfLikesOnProduct(@RequestParam(required = false)Long productId){
+    @GetMapping("/numberOfLike")
+    public Integer numberOfLikesOnProduct(@RequestParam(required = true)Long productId){
         return productServices.numberOfLikesOnProduct(productId);
     }
 }

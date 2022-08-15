@@ -35,9 +35,22 @@ public class SellerController {
 
     @GetMapping("/{id}/info")
     @JsonView(View.View1.class)
-    public Optional<Seller> infoSeller(@PathVariable("id") Long id,@RequestParam(required = false) Boolean follow,Principal principal,@RequestBody(required = false)CommentDTO commentDTO,Long deleteComment) {
+    public Optional<Seller> infoSeller(@PathVariable("id") Long id) {
 
-        return sellerServices.getSeller(id,follow,principal.getName(),commentDTO,deleteComment);
+        return sellerServices.getSeller(id);
+    }
+    @DeleteMapping("/{id}/info")
+    public void deleteCommentFromSellerComments(@PathVariable("id") Long id,@RequestParam(required = true)Long deleteComment,Principal principal){
+        sellerServices.deleteCommentFromSellerComments(id,deleteComment,principal.getName());
+    }
+
+    @PostMapping("/{id}/info")
+    public void addCommentToSeller(@PathVariable("id") Long id,@RequestBody(required = true)CommentDTO commentDTO,Principal principal){
+        sellerServices.addCommentToSeller(id,commentDTO,principal.getName());
+    }
+    @PutMapping("/{id}/info")
+    public void addFollow(@PathVariable("id") Long id,@RequestParam(required = true) Boolean follow,Principal principal){
+        sellerServices.addFollow(id,follow,principal.getName());
     }
 
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
@@ -61,16 +74,46 @@ public class SellerController {
 
     @GetMapping("{id}/product")
     @JsonView(View.View2.class)
-    public List<Product> showProduct(@PathVariable Long id, @RequestParam (required = false)Long productId,@RequestParam(required = false) Boolean like,@RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false)Long deleteComment,Principal principal) {
-        return sellerServices.showProduct(id,productId,like,commentDTO,deleteComment,principal.getName());
+    public List<Product> showProduct(@PathVariable Long id) {
+        return sellerServices.showProduct(id);
     }
+    @PostMapping("{id}/product")
+    public void addProductComment1(@PathVariable Long id, @RequestParam (required = true)Long productId,@RequestBody(required = true) CommentDTO commentDTO,Principal principal){
+        sellerServices.addComment1(id,productId,commentDTO,principal.getName());
+    }
+    @DeleteMapping ("{id}/product")
+    public void deleteProductComment1(@PathVariable Long id, @RequestParam (required = true)Long productId,@RequestParam(required = true)Long deleteComment,Principal principal){
+        sellerServices.deleteComment1(id,productId,deleteComment,principal.getName());
+    }
+    @PutMapping("{id}/product")
+    public void addProductLike1(@PathVariable Long id, @RequestParam (required = true)Long productId,@RequestParam(required = true) Boolean like,Principal principal){
+        sellerServices.addLike1(id,productId,like,principal.getName());
+    }
+
 
     @GetMapping("{id}/product/{id2}")
     @JsonView(View.View2.class)
-    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = false) Boolean like,@RequestBody(required = false) CommentDTO commentDTO,Long deleteComment,Principal principal) {
-        return sellerServices.getInfoSellerProductWithId(id, id2,like,commentDTO,deleteComment,principal.getName());
+    public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2) {
+        return sellerServices.getInfoSellerProductWithId(id, id2);
 
     }
+    @DeleteMapping ("{id}/product/{id2}")
+    public void deleteProductComment(@PathVariable Long id, @PathVariable Long id2,Long deleteComment,Principal principal) {
+         sellerServices.deleteComment(id, id2,deleteComment,principal.getName());
+
+    }
+    @PostMapping("{id}/product/{id2}")
+    public void addProductComment(@PathVariable Long id, @PathVariable Long id2,@RequestBody(required = true) CommentDTO commentDTO,Principal principal) {
+         sellerServices.addComment(id, id2,commentDTO,principal.getName());
+
+    }
+    @PutMapping("{id}/product/{id2}")
+    public void addProductLike(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = true) Boolean like,Principal principal) {
+        sellerServices.addLike(id, id2,like, principal.getName());
+
+    }
+
+
 
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
     @PutMapping("{id}/product/{id2}/update")
@@ -104,10 +147,24 @@ public class SellerController {
 
     @GetMapping("/")
     @JsonView(View.View1.class)
-    public List<User> sellers(@RequestParam(required = false)Long sellerId,@RequestParam(required = false) Boolean follow,Principal principal,@RequestBody(required = false)CommentDTO commentDTO,Long deleteComment) {
+    public List<User> sellers() {
 
-        return sellerServices.showSellers(sellerId,follow,principal.getName(),commentDTO,deleteComment );
+        return sellerServices.showSellers();
     }
+    @DeleteMapping("/")
+    public void deleteCommentFromSellerComments1(@RequestParam(required = true)Long sellerId,@RequestParam(required = true)Long deleteComment,Principal principal){
+        sellerServices.deleteCommentFromSellerComments1(sellerId,deleteComment,principal.getName());
+    }
+
+    @PostMapping("/")
+    public void addCommentToSeller1(@RequestParam(required = true)Long sellerId,@RequestBody(required = true)CommentDTO commentDTO,Principal principal){
+        sellerServices.addCommentToSeller1(sellerId,commentDTO,principal.getName());
+    }
+    @PutMapping("/")
+    public void addFollow1(@RequestParam(required = true)Long sellerId,@RequestParam(required = true) Boolean follow,Principal principal){
+        sellerServices.addFollow1(sellerId,follow,principal.getName());
+    }
+
    /* @GetMapping("/")
     public String sellers() {
 

@@ -23,7 +23,7 @@ public class Category {
             name="category",
             nullable = false
     )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private String category;
 
     public Category() {

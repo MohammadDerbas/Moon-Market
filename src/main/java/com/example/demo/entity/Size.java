@@ -17,7 +17,7 @@ public class Size {
     @Column(name = "id",updatable = false  )
     private long id;
     @Column(name = "size",nullable = false)
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private String size;
 
     public Size() {

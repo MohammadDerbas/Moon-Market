@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.StoreHouseDto;
 import com.example.demo.entity.Product;
 import com.example.demo.services.CustomerServices;
 import com.example.demo.services.ProductServices;
@@ -24,12 +25,12 @@ public class ProductController {
         this.productServices = productServices;
         this.customerServices = customerServices;
     }
-/*    @GetMapping("/")
-    @JsonView(View.View2.class)
-    public  List<Product> productList(@RequestParam(required = false) Long productId, @RequestParam(required = false) Boolean like, @RequestBody(required = false) CommentDTO commentDTO,@RequestParam(required = false) Long deleteComment,Principal principal){
-        return productServices.listProduct(productId,like,commentDTO,deleteComment,principal.getName());
+    @GetMapping("/{id}")
+    @JsonView(View.View4.class)
+    public StoreHouseDto getProductAndSellerId(@PathVariable Long id){
+        return productServices.gerProductAndSellerId(id);
 
-    }*/
+    }
     @PostMapping()
     public void addProductComment(@RequestParam(required = true) Long productId,  @RequestBody(required = true) CommentDTO commentDTO,Principal principal){
         productServices.addProductComment(productId,commentDTO,principal.getName());

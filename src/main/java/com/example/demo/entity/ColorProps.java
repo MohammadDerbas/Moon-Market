@@ -21,12 +21,12 @@ public class ColorProps {
     @Column(name = "id",updatable = false)
     private Long id;
     @Column(name = "color",nullable = false )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private String color;
     @OneToMany(
             mappedBy = "colorProps"
     )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Images> images=new ArrayList<>();
     @ManyToOne

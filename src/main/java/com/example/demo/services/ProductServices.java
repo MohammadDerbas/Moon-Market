@@ -1,11 +1,12 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.StoreHouseDto;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
+import com.example.demo.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,13 +21,15 @@ public class ProductServices {
     private final LikeRepo likeRepo;
     private final UserRepo userRepo;
     private final ProductCommentRepo productCommentRepo;
+    private final StoreHouseRepo storeHouseRepo;
     @Autowired
-    public ProductServices(ProductRepo productRepo, CustomerRepo customerRepo, LikeRepo likeRepo, UserRepo userRepo, ProductCommentRepo productCommentRepo) {
+    public ProductServices(ProductRepo productRepo, CustomerRepo customerRepo, LikeRepo likeRepo, UserRepo userRepo, ProductCommentRepo productCommentRepo, StoreHouseRepo storeHouseRepo) {
         this.productRepo = productRepo;
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
         this.userRepo = userRepo;
         this.productCommentRepo = productCommentRepo;
+        this.storeHouseRepo = storeHouseRepo;
     }
     public List<Product> listProduct(Long productId, Boolean like, CommentDTO commentDTO,Long deleteComment, String email) {
         if(productId!=null){
@@ -226,6 +229,20 @@ public class ProductServices {
 
 
         }
+    }
+    public StoreHouseDto gerProductAndSellerId(Long id){
+        boolean exist=productRepo.existsById(id);
+        if(!exist){
+            throw new ApiRequestException("this product is not exist");
+        }
+        System.out.println(convertToDto(storeHouseRepo.findStoreHouseByProductId(id)));
+       return convertToDto(storeHouseRepo.findStoreHouseByProductId(id));
+    }
+    public StoreHouseDto convertToDto(StoreHouse storeHouse){
+        StoreHouseDto storeHouseDto=new StoreHouseDto();
+        storeHouseDto.setProduct(storeHouse.getProduct());
+        storeHouseDto.setSellerId(storeHouse.getSeller().getId());
+        return storeHouseDto;
     }
 
     public void deleteProductComment(Long productId, Long deleteComment, String name) {

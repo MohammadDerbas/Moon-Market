@@ -17,28 +17,28 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",updatable = false)
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private Long id;
     @Column(name = "description",nullable = false )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
 
     private String description;
     @Column(name = "quantity",nullable = false )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
 
     private Integer quantity;
     @Transient
     private Integer points;
     @Column(name = "price",nullable = false )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
 
     private Double price;
 
     @Column(name = "num_Product_Purchaised",columnDefinition = "integer default 0",insertable = false)
     private Integer numberOfProductPurchaised;
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     LocalDate localDate=LocalDate.now();
-@Column(name = "date",insertable = false,columnDefinition = "Date DEFAULT CURRENT_DATE")
+    @Column(name = "date",insertable = false,columnDefinition = "Date DEFAULT CURRENT_DATE")
     private Date date;
     @OneToMany(
             mappedBy = "product"
@@ -127,12 +127,12 @@ public class Product {
 
 
     )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private List<Size> sizes=new ArrayList<>();
  @OneToMany(
          mappedBy = "product"
  )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private List<ColorProps> colorProps;
     @ManyToOne
     @JoinColumn(
@@ -141,7 +141,7 @@ public class Product {
             nullable = false,
             foreignKey = @ForeignKey(name = "product_type_id")
     )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
 
     private Type type;
 
@@ -160,7 +160,7 @@ public class Product {
             foreignKey = @ForeignKey(name = "product_brand_id")
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
 
     private Brand brand;
 
@@ -177,7 +177,7 @@ public class Product {
             foreignKey = @ForeignKey(name ="product_category_id_fk" )
 
     )
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private Category category;
     @OneToMany(mappedBy = "product",cascade = CascadeType.REMOVE)
     private List <StoreHouse> storeHouses = new ArrayList<>();

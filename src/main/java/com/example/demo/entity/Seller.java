@@ -18,7 +18,8 @@ public class Seller extends User{
             updatable = false
     )
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(View.View1.class)
+    @JsonView({View.View1.class,View.View4.class})
+
 
     private Long id;
 

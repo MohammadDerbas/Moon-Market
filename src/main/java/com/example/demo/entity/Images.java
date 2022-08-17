@@ -15,7 +15,7 @@ public class Images {
     private Long id;
 
     @Column(name = "images",nullable = false)
-    @JsonView(View.View2.class)
+    @JsonView({View.View2.class,View.View4.class})
     private String images;
     @ManyToOne
     @JoinColumn(

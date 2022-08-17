@@ -69,4 +69,13 @@ public class StoreHouse {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+
+    @Override
+    public String toString() {
+        return "StoreHouse{" +
+                ", seller=" + seller +
+                ", product=" + product +
+                ", date=" + date +
+                '}';
+    }
 }

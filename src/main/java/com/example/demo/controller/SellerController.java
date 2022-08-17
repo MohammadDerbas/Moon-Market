@@ -93,6 +93,8 @@ public class SellerController {
 
     @GetMapping("{id}/product/{id2}")
     @JsonView(View.View2.class)
+
+
     public Product InfoSellerProductWithId(@PathVariable Long id, @PathVariable Long id2) {
         return sellerServices.getInfoSellerProductWithId(id, id2);
 

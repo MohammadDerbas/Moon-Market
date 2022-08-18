@@ -16,6 +16,10 @@ public class SellerComment {
     )
     private String comment;
     @Column(
+            name = "rating"
+    )
+    private Double rating;
+    @Column(
             name = "time"
     )
     private LocalDateTime time;
@@ -36,10 +40,15 @@ public class SellerComment {
     public SellerComment() {
     }
 
-    public SellerComment( String comment) {
+    public SellerComment( String comment,Double rating) {
         this.comment = comment;
+        this.rating=rating;
         this.time=LocalDateTime.now();
     }
+//    public SellerComment( String comment) {
+//        this.comment = comment;
+//        this.time=LocalDateTime.now();
+//    }
 
     public Long getId() {
         return id;
@@ -70,6 +79,7 @@ public class SellerComment {
     public String getComment() {
         return comment;
     }
+    public Double getRating(){return rating;}
 
     public void setComment(String comment) {
         this.comment = comment;

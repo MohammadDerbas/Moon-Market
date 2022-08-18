@@ -74,7 +74,18 @@ public class SellerServices {
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
         }
+
         Optional<Seller> seller = sellerRepo.findUserById(id);
+        return seller;
+
+    }
+    public Optional<Seller> getSellerByPrincipal(String name) {
+        boolean exists = sellerRepo.existsByEmail(name);
+        if (!exists) {
+            throw new ApiRequestException("Seller with id " + name + "does not exist");
+        }
+        Long sellerId = sellerRepo.findIdByEmail(name);
+        Optional<Seller> seller = sellerRepo.findUserById(sellerId);
         return seller;
 
     }
@@ -294,6 +305,7 @@ public class SellerServices {
     private CommentFromDto convertToDTO(SellerComment sellerComment) {
         CommentFromDto dto = new CommentFromDto();
         dto.setComment(sellerComment.getComment());
+dto.setRating(sellerComment.getRating());
         dto.setFrom(sellerComment.getCustomer().getFirstName() + " " + sellerComment.getCustomer().getLastName());
         dto.setId(sellerComment.getId());
         dto.setTime(sellerComment.getTime());
@@ -553,7 +565,8 @@ public class SellerServices {
         }
         Customer customer = (Customer) customerRepo.findUserByEmail(name).get();
         String sellerComments = commentDTO.getComment();
-        SellerComment sellerComment = new SellerComment(sellerComments);
+        Double sellerRatings=commentDTO.getRating();
+        SellerComment sellerComment = new SellerComment(sellerComments,sellerRatings);
         sellerComment.setSeller(seller.get());
         sellerComment.setCustomer(customer);
         sellerCommentRepo.save(sellerComment);
@@ -605,7 +618,8 @@ public class SellerServices {
     }
 
 
-    public void addCommentToSeller1(Long sellerId, CommentDTO commentDTO, String name) {
+//    This for adding review to seller
+    public List<CommentFromDto> addCommentToSeller1(Long sellerId, CommentDTO commentDTO, String name) {
         boolean exists = sellerRepo.existsById(sellerId);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + sellerId + "does not exist");
@@ -619,10 +633,47 @@ public class SellerServices {
         }
         Customer customer = (Customer) customerRepo.findUserByEmail(name).get();
         String sellerComments = commentDTO.getComment();
-        SellerComment sellerComment = new SellerComment(sellerComments);
+        Double sellerRating= commentDTO.getRating();
+        SellerComment sellerComment = new SellerComment(sellerComments,sellerRating);
         sellerComment.setSeller(seller.get());
         sellerComment.setCustomer(customer);
         sellerCommentRepo.save(sellerComment);
+updateSellerRating(sellerId);
+        return showSellerComment(sellerId);
+
+    }
+
+
+    public void updateSellerRating (Long sellerId){
+        Seller seller = (Seller) sellerRepo.findUserById(sellerId).get();
+        Integer ratingAvg= sellerCommentRepo.getRatingAvg(sellerId);
+
+
+        seller.setStar(ratingAvg);
+        sellerRepo.save(seller);
+
+
+
+
+
+
+
+    }
+
+    /* it ends here */
+
+
+    public List<Product> getSellerProducts(String name){
+        boolean exist1 = sellerRepo.existsByEmail(name);
+        if (!exist1) {
+            throw new ApiRequestException("He is not a customer try to enter with a customer account");
+
+        }
+        Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
+        return productRepo.showProductWithSpecificSeller(seller.getId());
+
+
+
     }
 
     public void addFollow1(Long sellerId, Boolean follow, String name) {

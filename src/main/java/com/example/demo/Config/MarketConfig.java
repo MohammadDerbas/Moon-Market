@@ -161,7 +161,7 @@ public class MarketConfig {
 
             User user=new Seller("Mohammad",
                     "Derbas","mhammad_o_m@hotmail.com",
-                    "momo0598134316","AskarCamp",
+                    "123456","AskarCamp",
                     "0592215224","P4270413",List.of(sellerRole),"MohammadDerbasPic");
             String encoded1=passwordEncoder.bCryptPasswordEncoder().encode(user.getPassword());
             user.setPassword(encoded1);
@@ -223,7 +223,7 @@ public class MarketConfig {
             productComment.setCustomer((Customer) Mohammad);
             productComment.setProduct(product);
             productCommentRepo.save(productComment);
-            SellerComment sellerComment=new SellerComment("good Seller I advice to buy from him");
+            SellerComment sellerComment=new SellerComment("good Seller I advice to buy from him",4.0);
             sellerComment.setSeller((Seller) user);
             sellerComment.setCustomer((Customer) Mohammad);
             sellerCommentRepo.save(sellerComment);

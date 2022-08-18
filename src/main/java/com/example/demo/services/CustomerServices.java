@@ -124,6 +124,7 @@ public class CustomerServices {
         Order order=new Order(new OrderId(id,id2),customer.get(),product,quantity);
         orderRepo.save(order);
 
+
     }
 
 
@@ -163,7 +164,8 @@ public class CustomerServices {
         Optional<Customer> customer=customerRepo.findUserByID(id);
         Optional<Seller> seller=sellerRepo.findUserById(id2);
         String sellerComments=comment.getComment();
-        SellerComment sellerComment=new SellerComment(sellerComments);
+        double sellerRating=comment.getRating();
+        SellerComment sellerComment=new SellerComment(sellerComments,sellerRating);
         sellerComment.setSeller(seller.get());
         sellerComment.setCustomer(customer.get());
         sellerCommentRepo.save(sellerComment);

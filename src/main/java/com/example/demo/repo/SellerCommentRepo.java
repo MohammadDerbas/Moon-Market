@@ -17,4 +17,9 @@ public interface SellerCommentRepo extends JpaRepository<SellerComment,Long> {
 
     @Query("select (count(s) > 0) from SellerComment s where s.id = ?1 and s.customer.email=?2")
     boolean existsById(Long id,String email);
+
+    @Query("SELECT AVG(e.rating) FROM SellerComment e WHERE e.seller.id = ?1")
+    Integer getRatingAvg(Long id);
 }
+
+

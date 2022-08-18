@@ -35,9 +35,16 @@ public class SellerController {
 
     @GetMapping("/{id}/info")
     @JsonView(View.View1.class)
-    public Optional<Seller> infoSeller(@PathVariable("id") Long id) {
+    public Optional<Seller> infoSeller(@PathVariable Long id) {
 
         return sellerServices.getSeller(id);
+    }
+
+    @GetMapping("/info")
+    @JsonView(View.View1.class)
+    public Optional<Seller> infoSellerByprincipal(Principal principal) {
+
+        return sellerServices.getSellerByPrincipal(principal.getName());
     }
     @DeleteMapping("/{id}/info")
     public void deleteCommentFromSellerComments(@PathVariable("id") Long id,@RequestParam(required = true)Long deleteComment,Principal principal){
@@ -71,6 +78,13 @@ public class SellerController {
     public void addNewProduct(@PathVariable Long id, @RequestBody Product product) {
         sellerServices.addNewProduct(id, product);
     }
+@GetMapping("/product")
+@JsonView(View.View2.class)
+public List<Product> getProducts(Principal principal){
+
+        return sellerServices.getSellerProducts(principal.getName());
+
+}
 
     @GetMapping("{id}/product")
     @JsonView(View.View2.class)
@@ -159,8 +173,9 @@ public class SellerController {
     }
 
     @PostMapping("/")
-    public void addCommentToSeller1(@RequestParam(required = true)Long sellerId,@RequestBody(required = true)CommentDTO commentDTO,Principal principal){
-        sellerServices.addCommentToSeller1(sellerId,commentDTO,principal.getName());
+
+    public List<CommentFromDto> addCommentToSeller1(@RequestParam(required = true)Long sellerId,@RequestBody(required = true)CommentDTO commentDTO,Principal principal){
+      return  sellerServices.addCommentToSeller1(sellerId,commentDTO,principal.getName());
     }
     @PutMapping("/")
     public void addFollow1(@RequestParam(required = true)Long sellerId,@RequestParam(required = true) Boolean follow,Principal principal){

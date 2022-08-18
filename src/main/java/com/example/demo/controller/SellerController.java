@@ -202,6 +202,11 @@ public List<Product> getProducts(Principal principal){
     public List<CommentFromDto> showSellerComments(@PathVariable Long id) {
         return sellerServices.showSellerComment(id);
     }
+    @GetMapping("/seller-comments")
+
+    public List<CommentFromDto> showComments(Principal principal) {
+        return sellerServices.showComments(principal.getName());
+    }
     @GetMapping("/{id}/follower")
     @JsonView(View.View1.class)
     public List showFollower(@PathVariable Long id){

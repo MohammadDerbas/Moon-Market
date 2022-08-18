@@ -701,5 +701,18 @@ updateSellerRating(sellerId);
             }
         }
     }
+
+    public List<CommentFromDto> showComments(String name){
+
+
+        boolean exist1 = sellerRepo.existsByEmail(name);
+        if (!exist1) {
+            throw new ApiRequestException("He is not a customer try to enter with a customer account");
+
+        }
+        Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
+        return showSellerComment(seller.getId());
+
+    }
 }
 

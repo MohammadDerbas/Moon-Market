@@ -16,4 +16,8 @@ public class TemplateController {
     public String getCourses() {
         return "hello";
     }
+    @GetMapping("upload")
+    public String getImg() {
+        return "img";
+    }
 }

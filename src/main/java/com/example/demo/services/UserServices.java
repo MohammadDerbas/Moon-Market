@@ -141,4 +141,7 @@ public class UserServices implements UserDetailsService {
         }
         return authorities;
     }
+    public void forgetPassword(String email){
+
+    }
 }

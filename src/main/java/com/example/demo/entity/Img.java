@@ -1,35 +1,97 @@
 package com.example.demo.entity;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.example.demo.view.View;
+import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Arrays;
 
-@Entity(name = "Img")
+@Entity
 @Table(name = "img")
+/*@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor*/
 public class Img {
     @Id
-    @Column(name = "id",updatable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Lob
-    private MultipartFile images;
+    @JsonView({View.View2.class,View.View4.class})
+
+    @Column(name = "name")
+    private String name;
+    @JsonView({View.View2.class,View.View4.class})
+
+    @Column(name = "type")
+    private String type;
+    @JsonView({View.View2.class,View.View4.class})
+
+    @Column(name = "image", unique = false, nullable = false, length = 100000)
+    private byte[] image;
+    @ManyToOne
+    @JoinColumn(
+            name = "image_color_props_id",
+            referencedColumnName = "id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "image_color_props_id")
+
+    )
+    private ColorProps colorProps;
 
     public Img() {
     }
 
-    public MultipartFile getImages() {
-        return images;
+    public Img(String name, String type, byte[] image) {
+        this.name = name;
+        this.type = type;
+        this.image = image;
     }
 
-    public void setImages(MultipartFile images) {
-        this.images = images;
+    public Img(String name, String type, byte[] image, ColorProps colorProps) {
+        this.name = name;
+        this.type = type;
+        this.image = image;
+        this.colorProps = colorProps;
     }
 
-    @Override
-    public String toString() {
-        return "Img{" +
-                "id=" + id +
-                ", images=" + images +
-                '}';
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public ColorProps getColorProps() {
+        return colorProps;
+    }
+
+    public void setColorProps(ColorProps colorProps) {
+        this.colorProps = colorProps;
     }
 }
+
+
+
+

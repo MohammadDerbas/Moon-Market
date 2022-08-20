@@ -53,12 +53,42 @@ public class MarketConfig {
             Size large=new Size("large");
             Size x_large=new Size("x-large");
             Size xx_large=new Size("xx-large");
+            Size XS=new Size("xs");
+            Size S=new Size("s");
+            Size M=new Size("m");
+            Size L=new Size("l");
+            Size XL=new Size("xl");
+            Size XXL=new Size("xxl");
+            Size XXXL=new Size("xxxl");
+            Size S24=new Size("24");
+            Size S25=new Size("25");
+            Size S26=new Size("26");
+            Size S27=new Size("27");
+            Size S28=new Size("28");
+            Size S29=new Size("29");
+            Size S30=new Size("30");
+            Size S31=new Size("31");
+            Size S32=new Size("32");
+            Size S33=new Size("33");
+            Size S34=new Size("34");
+            Size S35=new Size("35");
+            Size S36=new Size("36");
+            Size S37=new Size("37");
+            Size S38=new Size("38");
+            Size S39=new Size("39");
+            Size S40=new Size("40");
 
-            Type t_shirt=new Type("T-shirt") ;
+
+
+            Type t_shirt=new Type("t-shirt") ;
             Type sweater=new Type("Sweater") ;
-            Type dress=new Type("Dress") ;
+            Type dress=new Type("dress") ;
             Type shorts=new Type("Shorts") ;
-            Type jeans=new Type("Jeans") ;
+            Type jeans=new Type("jeans") ;
+            Type trouser=new Type("trouser") ;
+            Type jacket=new Type("jacket") ;
+            Type blazer=new Type("blazer") ;
+
 
             Brand hugo_boss=new Brand("Hugo Boss");
             Brand lacoste=new Brand("Lacoste");
@@ -89,12 +119,12 @@ public class MarketConfig {
 
             mix1.stream().forEach(size -> size.addProduct(product));
             mix2.stream().forEach(size -> size.addProduct(product2));
-            sizeRepo.saveAll(List.of(medium,small,large,x_large,xx_large));
+            sizeRepo.saveAll(List.of(medium,small,large,x_large,xx_large,XS,S,M,L,XXL,XXXL,S24,S25,S26,S27,S28,S29,S30,S31,S32,S33,S34,S35,S36,S37,S38,S39,S40));
             System.out.println(x_large.getProducts());
             System.out.println("888888888888888888888");
             t_shirt.addProduct(product);
             jeans.addProduct(product2);
-            typeRepo.saveAll(List.of(t_shirt,dress,shorts,sweater,jeans));
+            typeRepo.saveAll(List.of(t_shirt,dress,shorts,sweater,jeans,trouser,jacket,blazer));
             lacoste.addProduct(product);
             hugo_boss.addProduct(product2);
             brandRepo.saveAll(List.of(lacoste,hugo_boss));

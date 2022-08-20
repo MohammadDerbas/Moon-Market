@@ -1,21 +1,21 @@
 package com.example.demo.services;
 
-import com.example.demo.DTO.ColorPropsDTO;
-import com.example.demo.DTO.CommentDTO;
-import com.example.demo.DTO.CommentFromDto;
-import com.example.demo.DTO.ImageDto;
+import com.example.demo.DTO.*;
+import com.example.demo.Util.ImageUtility;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +35,10 @@ public class SellerServices {
     private final CustomerRepo customerRepo;
     private final LikeRepo likeRepo;
     private final ProductCommentRepo productCommentRepo;
+    private final ImgRepo imgRepo;
 
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo, ImgRepo imgRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -53,6 +54,7 @@ public class SellerServices {
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
         this.productCommentRepo = productCommentRepo;
+        this.imgRepo = imgRepo;
     }
 
     public Product getInfoSellerProductWithId(Long id, Long id2) {
@@ -133,7 +135,32 @@ public class SellerServices {
         userRepo.save(seller);
     }
 
-    public void addNewProduct(Long id, @NotNull Product product) {
+    public void addNewProduct(Long id,String description,Integer quantity,Double price,String type,String brand,String category,List<String>sizes,List<String>color,List<MultipartFile>file1) throws IOException {
+        System.out.println(description+quantity+price+type+brand+category);
+        sizes.stream().forEach(s -> System.out.println(s));
+        file1.stream().forEach(multipartFile -> System.out.println(multipartFile.getOriginalFilename()));
+
+
+        Product product=new Product();
+        product.setDescription(description);
+        product.setQuantity(quantity);
+        product.setPrice(price);
+        product.setType(new Type(type));
+        product.setBrand(new Brand(brand));
+        product.setCategory(new Category(category));
+        List<Size>sizesList=new ArrayList<>();
+        sizes.stream().forEach(s -> sizesList.add(new Size(s)));
+        product.setSizes(sizesList);
+        product.setCategory(new Category(category));
+
+        System.out.println(product);
+        System.out.println(product.getBrand().getBrand());
+        System.out.println(product.getCategory().getCategory());
+        System.out.println(product.getType().getType());
+        product.getSizes().stream().forEach(size -> System.out.println(size));
+       // product.getColorProps().forEach(colorProps2 -> {System.out.println(colorProps2.getColor());
+          //  colorProps2.getImages().stream().forEach(img -> System.out.println(img.getName()));});
+        //Product product=new Product();
         boolean exists = brandRepo.existsByBrand(product.getBrand().getBrand());
         brandRepo.findByBrand(product.getBrand().getBrand()).addProduct(product);
         if (!exists)
@@ -142,6 +169,18 @@ public class SellerServices {
         typeRepo.findByType(product.getType().getType()).addProduct(product);
         if (!exists1)
             throw new ApiRequestException("this type does not exist");
+
+
+
+
+
+
+
+
+
+
+
+
         List<String> s = new ArrayList<>();
 
         product.getSizes().stream().forEach(size -> s.add(size.getSize()));
@@ -162,19 +201,35 @@ public class SellerServices {
         if (!exists3)
             throw new ApiRequestException("this category does not exist");
 
-
         productRepo.save(product);
-        product.getColorProps();
-        for (ColorProps colorProps : product.getColorProps()
-        ) {
+        color.stream().forEach(s1 -> {
+            ColorProps colorProps = new ColorProps(s1);
             colorProps.setProduct(product);
             colorPropsRepo.save(colorProps);
-            for (Images images : colorProps.getImages()
-            ) {
-                images.setColorProps(colorProps);
-                imagesRepo.save(images);
+            for (MultipartFile file:file1) {
+                String [] split=file.getOriginalFilename().split("-");
+                System.out.println(split[0]);
+                if(split[0].equals(colorProps.getColor())) {
+                    Img img = null;
+                    try {
+                        img = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    img.setColorProps(colorProps);
+                    imgRepo.save(img);
+                }
             }
-        }
+            } );
+
+
+
+
+
+
+
+
+
 
         //User seller=  sellerRepo.getReferenceById(id);
         Optional<Seller> seller = sellerRepo.findUserById(id);
@@ -334,7 +389,7 @@ dto.setRating(sellerComment.getRating());
         if (!exist2) {
             throw new ApiRequestException("color " + colorPropsDTO.getColor() + "does not exist for this product");
         }
-        boolean exist3 = imagesRepo.existsByImages(colorPropsDTO.getImages());
+        boolean exist3 = imgRepo.existsByImages(colorPropsDTO.getImages());
         if (!exist3) {
             throw new ApiRequestException("image does not exist for this product");
         }
@@ -345,11 +400,12 @@ dto.setRating(sellerComment.getRating());
         if (colorProps.getImages().size() == 1) {
             colorPropsRepo.deleteByColor(colorPropsDTO.getColor());
         }
+        else {
 
-
-        imagesRepo.deleteByImages(imagesRepo.findByImages(colorPropsDTO.getImages()));
-        System.out.println(colorProps.getImages().size() + "000000000000000000001");
-        System.out.println(colorProps.getImages());
+            imgRepo.deleteByImages(imgRepo.findByName(colorPropsDTO.getImages()).get());
+            System.out.println(colorProps.getImages().size() + "000000000000000000001");
+            System.out.println(colorProps.getImages());
+        }
     }
 
     public void addSellerImageProductWithId(Long id, Long id2, ColorPropsDTO colorPropsDTO) {

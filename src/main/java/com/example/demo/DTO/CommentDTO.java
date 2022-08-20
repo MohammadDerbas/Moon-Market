@@ -4,11 +4,13 @@ import java.util.Objects;
 
 public class CommentDTO {
     private String comment;
+    public Double rating;
     public CommentDTO() {
     }
 
-    public CommentDTO(String comment) {
+    public CommentDTO(String comment,Double rating) {
         this.comment = comment;
+        this.rating=rating;
     }
 
     public String getComment() {
@@ -17,6 +19,11 @@ public class CommentDTO {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Double getRating(){return this.rating;}
+    public void setRating(Double rating){
+        this.rating=rating;
     }
 
 

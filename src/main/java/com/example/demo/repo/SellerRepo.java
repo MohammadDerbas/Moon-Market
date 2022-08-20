@@ -23,5 +23,11 @@ public interface SellerRepo extends UserRepo{
     List<User> findAll();
  @Query("select u.id from Seller u where u.email=?1")
   Long findIdByEmail(String email);
+ @Query("select (count(u) > 0) from Seller u where u.email = ?1")
+ boolean existsByEmail(String email);
+
+ @Query("update Seller u set u.star = ?2 where u.id = ?1")
+ void updateSellerRating(Long id , Integer rating);
+
 
 }

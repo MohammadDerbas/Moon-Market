@@ -58,6 +58,7 @@ public class CustomerController {
     @GetMapping("/{id}/order-product/{id2}")
     public void orderProduct(@PathVariable Long id, @PathVariable Long id2,@RequestParam(required = true) Integer quantity) {
         customerServices.orderProduct(id, id2,quantity);
+
     }
     @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
     @DeleteMapping("/{id}/delete-order/{id2}")

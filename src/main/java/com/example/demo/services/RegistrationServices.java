@@ -5,12 +5,14 @@ import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.MemberShipRepo;
 import com.example.demo.repo.RoleRepo;
+import com.example.demo.repo.*;
+
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RegistrationServices {
@@ -20,13 +22,17 @@ public class RegistrationServices {
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
     private final RoleRepo roleRepo;
-    public RegistrationServices(UserServices userServices, EmailValidator emailValidator, MemberShipRepo memberShipRepo, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, RoleRepo roleRepo) {
+    private final UserRepo userRepo;
+
+
+    public RegistrationServices(UserServices userServices, EmailValidator emailValidator, MemberShipRepo memberShipRepo, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, RoleRepo roleRepo, UserRepo userRepo) {
         this.userServices = userServices;
         this.emailValidator = emailValidator;
         this.memberShipRepo = memberShipRepo;
         this.confirmationTokenService = confirmationTokenService;
         this.emailSender = emailSender;
         this.roleRepo = roleRepo;
+        this.userRepo = userRepo;
     }
 
     public String rigister(RegistrationRequest request) throws MessagingException {
@@ -105,7 +111,16 @@ public class RegistrationServices {
         userServices.enableUser(
                 confirmationToken.getUser().getEmail()
         );
+       User user= confirmationToken.getUser();
         return "confirmed";
+
+    }
+
+    public User verifyUser(String name){
+        User seller = userRepo.findUserByEmail(name).get();
+
+        return seller;
+
 
     }
     private String buildEmail(String name, String link) {

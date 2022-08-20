@@ -1,20 +1,22 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.ColorPropsDTO;
-import com.example.demo.DTO.CommentDTO;
-import com.example.demo.DTO.CommentFromDto;
-import com.example.demo.DTO.ImageDto;
+import com.example.demo.DTO.*;
 import com.example.demo.entity.*;
 import com.example.demo.repo.UserRepo;
 import com.example.demo.services.SellerServices;
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -67,9 +69,19 @@ public class SellerController {
         sellerServices.updateSellerInfo(id, firstName, lastName, email, password, address, phone, postalCode);
     }
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
-    @PostMapping("{id}/product/add")
-    public void addNewProduct(@PathVariable Long id, @RequestBody Product product) {
-        sellerServices.addNewProduct(id, product);
+    @PostMapping(value = "{id}/product/add",produces = MediaType.APPLICATION_JSON_VALUE)
+    public void addNewProduct(@PathVariable Long id,   @RequestParam(name = "description") String description,
+                              @RequestParam(name="quantity") Integer quantity,
+                              @RequestParam(name="price") Double price,
+                              @RequestParam(name="type") String type,
+                              @RequestParam(name="brand") String brand,
+                              @RequestParam(name="category") String category,
+                              @RequestParam(name="sizes[]") List<String> sizes,
+                              @RequestParam(name="color[][color]")List<String> color,
+                              @RequestParam(name="color[][images][]")List<MultipartFile> images
+
+                              ) throws IOException {
+        sellerServices.addNewProduct(id,description,quantity,price,type,brand,category,sizes,color,images);
     }
 
     @GetMapping("{id}/product")

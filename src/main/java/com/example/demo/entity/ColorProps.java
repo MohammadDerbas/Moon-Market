@@ -28,7 +28,7 @@ public class ColorProps {
     )
     @JsonView({View.View2.class,View.View4.class})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Images> images=new ArrayList<>();
+    private List<Img> images=new ArrayList<>();
     @ManyToOne
     @JoinColumn(
             name = "product_color_props_id",
@@ -46,17 +46,17 @@ public class ColorProps {
         this.color = color;
     }
 
-    public ColorProps(String color, List<Images> images) {
+    public ColorProps(String color, List<Img> images) {
         this.color = color;
         this.images = images;
     }
-    public void addImages(Images image){
+    public void addImages(Img image){
         if(!images.contains(image)){
             images.add(image);
             image.setColorProps(this);
         }
     }
-    public void removeImages(Images image){
+    public void removeImages(Img image){
         if(images.contains(image)){
             images.remove(image);
             image.setColorProps(null);
@@ -79,11 +79,11 @@ public class ColorProps {
         this.color = color;
     }
 
-    public List<Images> getImages() {
+    public List<Img> getImages() {
         return images;
     }
 
-    public void setImages(List<Images> images) {
+    public void setImages(List<Img> images) {
         this.images = images;
     }
 

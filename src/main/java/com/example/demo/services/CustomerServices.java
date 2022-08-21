@@ -1,13 +1,16 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.*;
+import com.example.demo.Util.ImageUtility;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -237,13 +240,14 @@ public class CustomerServices {
     }
 
 
-    public void updateCustomerImage(Long id, ImageDto image) {
+    public void updateCustomerImage(Long id, MultipartFile multipartFile) throws IOException {
         boolean exist=customerRepo.existsById(id);
         if (!exist) {
             throw new ApiRequestException("customer with id" + id + "does not exist");
         }
         Optional<Customer> user=customerRepo.findUserByID(id);
-        userRepo.updateUserImage(image.getImage());
+        userRepo.updateUserImage(new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename())
+        );
     }
 
     public List showCustomerLikedProduct(Long id) {

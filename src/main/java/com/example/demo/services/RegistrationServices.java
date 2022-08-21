@@ -1,6 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.DTO.RegistrationRequest;
+import com.example.demo.Util.ImageUtility;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.MemberShipRepo;
@@ -8,11 +8,12 @@ import com.example.demo.repo.RoleRepo;
 import com.example.demo.repo.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Service
 public class RegistrationServices {
@@ -23,9 +24,10 @@ public class RegistrationServices {
     private final EmailSender emailSender;
     private final RoleRepo roleRepo;
     private final UserRepo userRepo;
+    private final ImageProfilePicRepo imageProfilePicRepo;
 
 
-    public RegistrationServices(UserServices userServices, EmailValidator emailValidator, MemberShipRepo memberShipRepo, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, RoleRepo roleRepo, UserRepo userRepo) {
+    public RegistrationServices(UserServices userServices, EmailValidator emailValidator, MemberShipRepo memberShipRepo, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, RoleRepo roleRepo, UserRepo userRepo, ImageProfilePicRepo imageProfilePicRepo) {
         this.userServices = userServices;
         this.emailValidator = emailValidator;
         this.memberShipRepo = memberShipRepo;
@@ -33,58 +35,62 @@ public class RegistrationServices {
         this.emailSender = emailSender;
         this.roleRepo = roleRepo;
         this.userRepo = userRepo;
+        this.imageProfilePicRepo = imageProfilePicRepo;
     }
 
-    public String rigister(RegistrationRequest request) throws MessagingException {
-       boolean isValidEmail = emailValidator.test(request.getEmail());
+    public String rigister(String firstName, String lastName, String email, String password, String address, String phone, String postalcode,Boolean isCustomer,Boolean isSeller, MultipartFile multipartFile) throws MessagingException, IOException {
+       boolean isValidEmail = emailValidator.test(email);
         if(!isValidEmail){
         throw new ApiRequestException("email not valid");
         }
-        if(request.getCustomer()) {
+
+        if(isCustomer) {
             Role role=roleRepo.findByName("CUSTOMER");
 
             Customer popo = new Customer(
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getEmail(),
-                    request.getPassword(),
-                    request.getAddress(),
-                    request.getPhone(),
-                    request.getPostalCode(),
-                    Arrays.asList(role),
-                    request.getProfilePic()
-            );
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    address,
+                    phone,
+                    postalcode,
+                    Arrays.asList(role));
+
+
 
             memberShipRepo.findByType("No-MemberShip").addCustomer(popo);
 
 
             String token = userServices.signUpUser(
-                    popo
+                    popo,
+                    multipartFile
             );
             String link="http://localhost:8080/registration/confirm?token="+token;
-            emailSender.send(request.getEmail(),buildEmail(request.getFirstName(),link));
+            emailSender.send(email,buildEmail(firstName,link));
 
             return token;
         }
-        if(request.getSeller()){
+        if(isSeller){
             Role role=roleRepo.findByName("SELLER");
             Seller seller = new Seller(
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getEmail(),
-                    request.getPassword(),
-                    request.getAddress(),
-                    request.getPhone(),
-                    request.getPostalCode(),
-                    Arrays.asList(role),
-                    request.getProfilePic()
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    address,
+                    phone,
+                    postalcode,
+                    Arrays.asList(role)
             );
+
             String token = userServices.signUpUser(
-                    seller
+                    seller,
+                    multipartFile
             );
             System.out.println(seller.getAuthorities()+"999999999999999999999999999999999999999999999");
             String link="http://localhost:8080/registration/confirm?token="+token;
-            emailSender.send(request.getEmail(),buildEmail(request.getFirstName(),link));
+            emailSender.send(email,buildEmail(firstName,link));
 
 
             return token;

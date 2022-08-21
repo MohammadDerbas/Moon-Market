@@ -3,6 +3,8 @@ package com.example.demo.entity;
 import com.example.demo.entity.Privilege;
 import com.example.demo.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -18,9 +20,9 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private Collection<User> users;
-
+    @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToMany(
-            fetch = FetchType.EAGER
+           // fetch = FetchType.EAGER
     )
     @JoinTable(
             name = "roles_privileges",

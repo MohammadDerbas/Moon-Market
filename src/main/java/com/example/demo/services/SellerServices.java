@@ -212,7 +212,7 @@ public class SellerServices {
                 if(split[0].equals(colorProps.getColor())) {
                     Img img = null;
                     try {
-                        img = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()));
+                        img = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()),"http://localhost:8080/img/get/image/"+file.getOriginalFilename());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -440,13 +440,14 @@ dto.setRating(sellerComment.getRating());
 
     }
 
-    public void updateSellerImage(Long id, ImageDto image) {
+    public void updateSellerImage(Long id, MultipartFile multipartFile) throws IOException {
         boolean exist = sellerRepo.existsById(id);
         if (!exist) {
             throw new ApiRequestException("seller with id" + id + "does not exist");
         }
         Optional<Seller> user = sellerRepo.findUserById(id);
-        userRepo.updateUserImage(image.getImage());
+        userRepo.updateUserImage(new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename())
+        );
 
     }
 

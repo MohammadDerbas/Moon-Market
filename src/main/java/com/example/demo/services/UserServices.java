@@ -1,19 +1,22 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.UserDTO;
+import com.example.demo.Util.ImageUtility;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
+import com.example.demo.repo.ImageProfilePicRepo;
 import com.example.demo.repo.RoleRepo;
 import com.example.demo.repo.UserRepo;
 import com.example.demo.security.PasswordEncoder;
-import org.hibernate.loader.entity.NaturalIdEntityJoinWalker;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -25,11 +28,13 @@ public class UserServices implements UserDetailsService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
     private final ConfirmationTokenService confirmationTokenService;
+    private final ImageProfilePicRepo imageProfilePicRepo;
 
-    public UserServices(UserRepo userRepo, RoleRepo roleRepo, ConfirmationTokenService confirmationTokenService) {
+    public UserServices(UserRepo userRepo, RoleRepo roleRepo, ConfirmationTokenService confirmationTokenService, ImageProfilePicRepo imageProfilePicRepo) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.confirmationTokenService = confirmationTokenService;
+        this.imageProfilePicRepo = imageProfilePicRepo;
     }
 
 
@@ -58,7 +63,7 @@ public class UserServices implements UserDetailsService {
         return user;
 
     }
-    public String signUpUser(Customer customer){
+    public String signUpUser(Customer customer, MultipartFile multipartFile) throws IOException {
         boolean userExists = userRepo.findUserByEmail(customer.getEmail())
                 .isPresent();
         if(userExists){
@@ -71,6 +76,9 @@ public class UserServices implements UserDetailsService {
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(customer.getPassword());
         customer.setPassword(encodedPassword);
         userRepo.save(customer);
+        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename());
+        imgProfilePic.setUser(customer);
+        imageProfilePicRepo.save(imgProfilePic);
         String token= UUID.randomUUID().toString();
         ConfirmationToken confirmationToken=new ConfirmationToken(
                 token,
@@ -83,7 +91,7 @@ public class UserServices implements UserDetailsService {
         return token;
 
     }
-    public String signUpUser(Seller seller){
+    public String signUpUser(Seller seller,MultipartFile multipartFile) throws IOException {
         boolean userExists = userRepo.findUserByEmail(seller.getEmail())
                 .isPresent();
         if(userExists){
@@ -96,6 +104,9 @@ public class UserServices implements UserDetailsService {
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(seller.getPassword());
         seller.setPassword(encodedPassword);
         userRepo.save(seller);
+        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename());
+        imgProfilePic.setUser(seller);
+        imageProfilePicRepo.save(imgProfilePic);
         String token= UUID.randomUUID().toString();
         ConfirmationToken confirmationToken=new ConfirmationToken(
                 token,
@@ -142,6 +153,11 @@ public class UserServices implements UserDetailsService {
         return authorities;
     }
     public void forgetPassword(String email){
+
+    }
+
+    public void disableAccount(Long id) {
+        userRepo.existsById(id);
 
     }
 }

@@ -1,133 +1,100 @@
 package com.example.demo.services;
 
-import com.example.demo.Util.ImageUtility;
-import com.example.demo.entity.*;
+import com.example.demo.RequestApi.ParameterStringBuilder;
+import com.example.demo.entity.ConfirmationToken;
+import com.example.demo.entity.EmailSender;
+import com.example.demo.entity.User;
 import com.example.demo.exception.ApiRequestException;
-import com.example.demo.repo.MemberShipRepo;
-import com.example.demo.repo.RoleRepo;
-import com.example.demo.repo.*;
-
+import com.example.demo.repo.ConfirmationTokenRepository;
+import com.example.demo.repo.UserRepo;
+import com.example.demo.security.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class RegistrationServices {
-    private final UserServices userServices;
-    private final EmailValidator emailValidator;
-    private final MemberShipRepo memberShipRepo;
+public class ForgetPasswordServices {
     private final ConfirmationTokenService confirmationTokenService;
-    private final EmailSender emailSender;
-    private final RoleRepo roleRepo;
     private final UserRepo userRepo;
-    private final ImageProfilePicRepo imageProfilePicRepo;
-
-
-    public RegistrationServices(UserServices userServices, EmailValidator emailValidator, MemberShipRepo memberShipRepo, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, RoleRepo roleRepo, UserRepo userRepo, ImageProfilePicRepo imageProfilePicRepo) {
-        this.userServices = userServices;
-        this.emailValidator = emailValidator;
-        this.memberShipRepo = memberShipRepo;
+    private final EmailSender emailSender;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
+    public ForgetPasswordServices(ConfirmationTokenService confirmationTokenService, UserRepo userRepo, EmailSender emailSender, ConfirmationTokenRepository confirmationTokenRepository) {
         this.confirmationTokenService = confirmationTokenService;
-        this.emailSender = emailSender;
-        this.roleRepo = roleRepo;
         this.userRepo = userRepo;
-        this.imageProfilePicRepo = imageProfilePicRepo;
+        this.emailSender = emailSender;
+        this.confirmationTokenRepository = confirmationTokenRepository;
     }
-
-    public String rigister(String firstName, String lastName, String email, String password, String address, String phone, String postalcode,Boolean isCustomer,Boolean isSeller, MultipartFile multipartFile) throws MessagingException, IOException {
-       boolean isValidEmail = emailValidator.test(email);
-        if(!isValidEmail){
-        throw new ApiRequestException("email not valid");
-        }
-
-        if(isCustomer) {
-            Role role=roleRepo.findByName("CUSTOMER");
-
-            Customer popo = new Customer(
-                    firstName,
-                    lastName,
-                    email,
-                    password,
-                    address,
-                    phone,
-                    postalcode,
-                    Arrays.asList(role));
-
-
-
-            memberShipRepo.findByType("No-MemberShip").addCustomer(popo);
-
-
-            String token = userServices.signUpUser(
-                    popo,
-                    multipartFile
-            );
-            String link="http://localhost:8080/registration/confirm?token="+token;
-            emailSender.send(email,buildEmail(firstName,link),"s");
-
-            return token;
-        }
-        if(isSeller){
-            Role role=roleRepo.findByName("SELLER");
-            Seller seller = new Seller(
-                    firstName,
-                    lastName,
-                    email,
-                    password,
-                    address,
-                    phone,
-                    postalcode,
-                    Arrays.asList(role)
-            );
-
-            String token = userServices.signUpUser(
-                    seller,
-                    multipartFile
-            );
-            System.out.println(seller.getAuthorities()+"999999999999999999999999999999999999999999999");
-            String link="http://localhost:8080/registration/confirm?token="+token;
-            emailSender.send(email,buildEmail(firstName,link),"s");
-
-
-            return token;
-
-        }
-        return "not-reachable";
+    public void sendEmail(String email) throws MessagingException {
+        Optional<User> user=userRepo.findUserByEmail(email);
+        String token= UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken=new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                user.get()
+        );
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+        String link="http://localhost:8080/forget_password/confirm?token="+token;
+        emailSender.send(email,buildEmail(user.get().getFirstName(),link),"Reset");
 
     }
-
-    public String confirmToken(String token) {
+    public void confirmToken(String token) throws IOException {
         System.out.println(token);
         ConfirmationToken confirmationToken=confirmationTokenService
                 .getToken(token)
                 .orElseThrow(()->
                         new ApiRequestException("token not found"));
-            if(confirmationToken.getConfirmedAt()!=null){
-                throw new ApiRequestException("email already confirmed");
-            }
+        if(confirmationToken.getConfirmedAt()!=null){
+            throw new ApiRequestException("this link was used");
+        }
         LocalDateTime expiresAt = confirmationToken.getExpiresAt();
         if(expiresAt.isBefore(LocalDateTime.now())){
             throw new ApiRequestException("token expired");
         }
         confirmationTokenService.setConfirmedAt(token);
-        userServices.enableUser(
-                confirmationToken.getUser().getEmail()
-        );
-       User user= confirmationToken.getUser();
-        return "confirmed";
+
+        User user= confirmationToken.getUser();
+
+
+        URL url = new URL("http://localhost:8080/forget_password/enter_password");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("token", token);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+
 
     }
 
-    public User verifyUser(String name){
-        User seller = userRepo.findUserByEmail(name).get();
+    public void changePassword(String token, String password, String passwordAgain) {
+        boolean exist=confirmationTokenRepository.existsByToken(token);
+        if(!exist){
+            throw new ApiRequestException("this user not exist");
 
-        return seller;
+        }
+        User user=confirmationTokenRepository.getUserByToken(token);
 
-
+        if(!password.equals(passwordAgain)){
+            throw new ApiRequestException("two password are not equal try again");
+        }
+        PasswordEncoder passwordEncoder=new PasswordEncoder();
+        String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(password);
+        userRepo.updatePassword(encodedPassword,user);
     }
     private String buildEmail(String name, String link) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
@@ -147,7 +114,7 @@ public class RegistrationServices {
                 "                  \n" +
                 "                    </td>\n" +
                 "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
-                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
+                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Reset your Password</span>\n" +
                 "                    </td>\n" +
                 "                  </tr>\n" +
                 "                </tbody></table>\n" +
@@ -185,7 +152,7 @@ public class RegistrationServices {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> You ask for reset your password if not you delete the email. Please click on the below link to reset your password: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Reset Password</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +

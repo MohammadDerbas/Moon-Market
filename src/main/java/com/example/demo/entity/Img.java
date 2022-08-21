@@ -23,15 +23,17 @@ public class Img {
     private Long id;
     @JsonView({View.View2.class,View.View4.class})
 
-    @Column(name = "name")
+    @Column(name = "name", unique = false, nullable = true)
     private String name;
     @JsonView({View.View2.class,View.View4.class})
 
-    @Column(name = "type")
+    @Column(name = "type", unique = false, nullable = true)
     private String type;
     @JsonView({View.View2.class,View.View4.class})
+    @Column(name = "url")
+    private String url;
 
-    @Column(name = "image", unique = false, nullable = false, length = 100000)
+    @Column(name = "image", unique = false, nullable = true, length = 100000)
     private byte[] image;
     @ManyToOne
     @JoinColumn(
@@ -43,13 +45,22 @@ public class Img {
     )
     private ColorProps colorProps;
 
+
+
+
     public Img() {
     }
+    public Img(String url){
 
-    public Img(String name, String type, byte[] image) {
+
+        this.url=url;
+    }
+
+    public Img(String name, String type, byte[] image,String url) {
         this.name = name;
         this.type = type;
         this.image = image;
+        this.url=url   ;
     }
 
     public Img(String name, String type, byte[] image, ColorProps colorProps) {
@@ -90,6 +101,15 @@ public class Img {
     public void setColorProps(ColorProps colorProps) {
         this.colorProps = colorProps;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 }
 
 

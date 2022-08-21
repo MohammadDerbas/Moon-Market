@@ -38,6 +38,7 @@ public class ColorProps {
 
     )
 
+
     private Product product;
     public ColorProps() {
     }

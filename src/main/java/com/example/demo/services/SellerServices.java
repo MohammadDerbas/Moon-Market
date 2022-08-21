@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,9 +134,10 @@ public class SellerServices {
         userRepo.save(seller);
     }
 
-    public void addNewProduct(Long id,String description,Integer quantity,Double price,String type,String brand,String category,List<String>sizes,List<String>color,List<MultipartFile>file1) throws IOException {
-        System.out.println(description+quantity+price+type+brand+category);
-        sizes.stream().forEach(s -> System.out.println(s));
+    public void addNewProduct(String name, String description, Integer quantity, Double price, String type, String brand, String category, List<String>sizes, List<String>color, List<MultipartFile>file1) throws IOException {
+     Optional<User> sellers=sellerRepo.findUserByEmail(name);
+     Long id =sellers.get().getId();
+
         file1.stream().forEach(multipartFile -> System.out.println(multipartFile.getOriginalFilename()));
 
 
@@ -212,7 +212,7 @@ public class SellerServices {
                 if(split[0].equals(colorProps.getColor())) {
                     Img img = null;
                     try {
-                        img = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()));
+                        img = new Img( file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()),"http://localhost:8080/img/get/image/"+file.getOriginalFilename());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -768,6 +768,104 @@ updateSellerRating(sellerId);
         }
         Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
         return showSellerComment(seller.getId());
+
+    }
+
+
+
+
+    public void createTestProduct(Product newProduct ,String name) {
+        Optional<User> sellers=sellerRepo.findUserByEmail(name);
+        Long id =sellers.get().getId();
+        Product product=new Product();
+        product.setDescription(newProduct.getDescription());
+        product.setQuantity(newProduct.getQuantity());
+        product.setPrice(newProduct.getPrice());
+        product.setType(new Type(newProduct.getType().getType()));
+        product.setBrand(new Brand(newProduct.getBrand().getBrand()));
+        product.setCategory(new Category(newProduct.getCategory().getCategory()));
+        List<Size>sizesList=new ArrayList<>();
+        newProduct.getSizes().stream().forEach(s -> sizesList.add(new Size(s.getSize())));
+        product.setSizes(sizesList);
+
+
+
+//        continue
+        boolean exists = brandRepo.existsByBrand(product.getBrand().getBrand());
+        brandRepo.findByBrand(product.getBrand().getBrand()).addProduct(product);
+        if (!exists)
+            throw new ApiRequestException("this brand does not exist");
+        boolean exists1 = typeRepo.existsByType(product.getType().getType());
+        typeRepo.findByType(product.getType().getType()).addProduct(product);
+        if (!exists1)
+            throw new ApiRequestException("this type does not exist");
+
+
+
+
+
+
+
+
+
+
+
+
+        List<String> s = new ArrayList<>();
+
+        product.getSizes().stream().forEach(size -> s.add(size.getSize()));
+        boolean exists2 = sizeRepo.existsBySizeIn(s);
+
+        List<Size> sizes2 = sizeRepo.findBySize(s);
+        ArrayList<Size> ss = new ArrayList<>();
+        product.setSizes(ss);
+
+        sizeRepo.findBySize(s).forEach(size -> size.addProduct(product));//add product
+
+        if (!exists2)
+            throw new ApiRequestException("this size does not exist");
+        boolean exists3 = categoryRepo.existsByCategory(product.getCategory().getCategory());
+        categoryRepo.findByCategory(product.getCategory().getCategory()).addProduct(product);
+        if (!exists3)
+            throw new ApiRequestException("this category does not exist");
+
+
+        product.setColorProps(newProduct.getColorProps() );
+
+
+
+        productRepo.save(product);
+
+
+
+
+
+        product.getColorProps().stream().forEach(s1 -> {
+            ColorProps colorProps = new ColorProps(s1.getColor());
+            List<Img> imgs=new ArrayList<>();
+            colorProps.setProduct(product);
+            colorPropsRepo.save(colorProps);
+            for (Img img:s1.getImages()) {
+
+              Img newImg=new Img(img.getUrl());
+                    newImg.setColorProps(colorProps);
+                    imgRepo.save(newImg);
+                    imgs.add(newImg);
+                }
+            colorProps.setImages(imgs);
+            }
+     );
+
+
+
+
+
+
+
+        //User seller=  sellerRepo.getReferenceById(id);
+        Optional<Seller> seller = sellerRepo.findUserById(id);
+        StoreHouse op = new StoreHouse(new StoreHouseId(id, product.getId()), seller.get(), product);
+        storeHouseRepo.save(op);
 
     }
 }

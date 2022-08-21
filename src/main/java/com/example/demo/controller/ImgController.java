@@ -47,7 +47,7 @@ public class ImgController {
         for (MultipartFile file:file1
              ) {
 
-            Img img1 = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()));
+            Img img1 = new Img(file.getOriginalFilename(), file.getContentType(), ImageUtility.compressImage(file.getBytes()),"http://localhost:8080/img/get/image/"+file.getOriginalFilename());
             imgRepo.save(img1);
            /* imgRepo.save(Img.builder()
                     .name(file.getOriginalFilename())
@@ -63,7 +63,7 @@ public class ImgController {
     public Img getImageDetails(@PathVariable("name") String name) throws IOException {
 
         final Optional<Img> dbImage = imgRepo.findByName(name);
-        Img img1 = new Img(dbImage.get().getName(), dbImage.get().getType(), ImageUtility.decompressImage(dbImage.get().getImage()));
+        Img img1 = new Img(dbImage.get().getName(), dbImage.get().getType(), ImageUtility.decompressImage(dbImage.get().getImage()),"http://localhost:8080/img/get/image/"+dbImage.get().getName());
     return img1;
         /*return Img.builder()
                 .name(dbImage.get().getName())

@@ -75,9 +75,10 @@ public class SellerController {
                                  @RequestParam(required = false) String postalCode) {
         sellerServices.updateSellerInfo(id, firstName, lastName, email, password, address, phone, postalCode);
     }
-    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
-    @PostMapping(value = "{id}/product/add",produces = MediaType.APPLICATION_JSON_VALUE)
-    public void addNewProduct(@PathVariable Long id,   @RequestParam(name = "description") String description,
+
+
+    @PostMapping(value = "/product/add",produces = MediaType.APPLICATION_JSON_VALUE)
+    public void addNewProduct(Principal principal,   @RequestParam(name = "description") String description,
                               @RequestParam(name="quantity") Integer quantity,
                               @RequestParam(name="price") Double price,
                               @RequestParam(name="type") String type,
@@ -88,7 +89,13 @@ public class SellerController {
                               @RequestParam(name="color[][images][]")List<MultipartFile> images
 
                               ) throws IOException {
-        sellerServices.addNewProduct(id,description,quantity,price,type,brand,category,sizes,color,images);
+        sellerServices.addNewProduct(principal.getName(),description,quantity,price,type,brand,category,sizes,color,images);
+    }
+    @PostMapping(value="/product/insert",produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public void InsertMultipleProducts( @RequestBody Product product,
+                                         Principal principal){
+
+        sellerServices.createTestProduct(product, principal.getName());
     }
 @GetMapping("/product")
 @JsonView(View.View2.class)

@@ -2,64 +2,57 @@ package com.example.demo.entity;
 
 import com.example.demo.view.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Arrays;
 
-@Entity
-@Table(name = "img")
-/*@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor*/
-public class Img {
+@Entity(name="ImgProfilePic")
+@Table(name="img_profile_pic")
+public class ImgProfilePic {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonView({View.View2.class,View.View4.class})
+    @JsonView({View.View1.class, View.View3.class})
 
     @Column(name = "name")
     private String name;
-    @JsonView({View.View2.class,View.View4.class})
+    @JsonView({View.View1.class, View.View3.class})
 
     @Column(name = "type")
     private String type;
     //@JsonView({View.View2.class,View.View4.class})
 
-    @Column(name = "image", unique = false, nullable = false, length = 100000)
+    @Column(name = "image")
     private byte[] image;
-    @ManyToOne
-    @JoinColumn(
-            name = "image_color_props_id",
-            referencedColumnName = "id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "image_color_props_id")
 
-    )
-    private ColorProps colorProps;
-    @JsonView({View.View2.class,View.View4.class})
+    @JsonView({View.View1.class, View.View3.class})
     private String url;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
-    public Img() {
+    public ImgProfilePic() {
     }
 
-    public Img(String name, String type, byte[] image,String url) {
+    public ImgProfilePic(String name, String type, byte[] image,String url) {
         this.name = name;
         this.type = type;
         this.image = image;
         this.url=url;
     }
 
-    public Img(String name, String type, byte[] image, ColorProps colorProps) {
+    public ImgProfilePic(String name, String type, byte[] image) {
         this.name = name;
         this.type = type;
         this.image = image;
-        this.colorProps = colorProps;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getUrl() {
@@ -94,15 +87,5 @@ public class Img {
         this.image = image;
     }
 
-    public ColorProps getColorProps() {
-        return colorProps;
-    }
 
-    public void setColorProps(ColorProps colorProps) {
-        this.colorProps = colorProps;
-    }
 }
-
-
-
-

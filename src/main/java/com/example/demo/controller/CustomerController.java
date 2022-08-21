@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -109,8 +111,8 @@ public class CustomerController {
     @PreAuthorize("hasAuthority('CUSTOMER') and #id==authentication.principal.id")
     @PostMapping("{id}/update-image")
 
-    public void updateCustomerImage(@PathVariable Long id, @RequestBody ImageDto image){
-        customerServices.updateCustomerImage(id,image);
+    public void updateCustomerImage(@PathVariable Long id, @RequestParam("image")MultipartFile file) throws IOException {
+        customerServices.updateCustomerImage(id,file);
     }
 
 

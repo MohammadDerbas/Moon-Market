@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.security.Principal;
 
 @RestController
@@ -20,8 +22,8 @@ public class RegistrationController {
         this.registrationServices = registrationServices;
     }
     @PostMapping("/")
-    public String register(@RequestBody RegistrationRequest request) throws MessagingException {
-    return registrationServices.rigister(request);
+    public String register(@RequestParam("firstName")String firstName, @RequestParam("lastName")String lastName, @RequestParam("email")String email, @RequestParam("password")String password, @RequestParam("address")String address, @RequestParam("phone")String phone, @RequestParam("postalcode")String postalcode,@RequestParam("isCustomer")Boolean isCustomer,@RequestParam("isSeller")Boolean isSeller, @RequestParam("image")MultipartFile multipartFile) throws MessagingException, IOException {
+    return registrationServices.rigister(firstName,lastName,email,password,address,phone,postalcode,isCustomer,isSeller,multipartFile);
     }
     @GetMapping(path = "/confirm")
     public String confirm(@RequestParam("token") String token){

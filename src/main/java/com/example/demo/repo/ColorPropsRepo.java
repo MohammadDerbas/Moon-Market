@@ -17,4 +17,5 @@ public interface ColorPropsRepo extends JpaRepository<ColorProps,Long> {
     @Transactional
     @Query("delete from ColorProps s where s.color=?1")
     void deleteByColor(String color);
+
 }

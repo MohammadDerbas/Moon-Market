@@ -1,5 +1,7 @@
 package com.example.demo.DTO;
 
+import com.example.demo.entity.ImgProfilePic;
+
 import java.util.Objects;
 
 public class RegistrationRequest {
@@ -10,12 +12,12 @@ public class RegistrationRequest {
     private final String address;
     private final String phone;
     private final String postalCode;
-    private final String profilePic;
+    private final ImgProfilePic profilePic;
     private final Boolean isCustomer;
     private final Boolean isSeller;
 
 
-    public RegistrationRequest(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Boolean isCustomer, Boolean isSeller, String profilePic) {
+    public RegistrationRequest(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Boolean isCustomer, Boolean isSeller, ImgProfilePic profilePic) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -28,7 +30,7 @@ public class RegistrationRequest {
         this.profilePic = profilePic;
     }
 
-    public String getProfilePic() {
+    public ImgProfilePic getProfilePic() {
         return profilePic;
     }
 

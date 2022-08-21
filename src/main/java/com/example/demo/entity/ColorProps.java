@@ -39,6 +39,8 @@ public class ColorProps {
     )
 
     private Product product;
+
+
     public ColorProps() {
     }
 
@@ -62,6 +64,8 @@ public class ColorProps {
             image.setColorProps(null);
         }
     }
+
+
 
     public Long getId() {
         return id;

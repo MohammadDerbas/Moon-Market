@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo,ImageProfilePicRepo imageProfilePicRepo){
         return args -> {
             Privilege seller_read=new Privilege("SELLER_READ");
             Privilege seller_write=new Privilege("SELLER_WRITE");
@@ -40,13 +40,15 @@ public class MarketConfig {
             roleRepo.saveAll(List.of(adminRole,sellerRole,customerRole));
 
 
-
-            User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole),"mohammadDerbasPic");
+            ImgProfilePic imgProfilePicAdmin=new ImgProfilePic();
+            User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole));
+            imgProfilePicAdmin.setUser(admin);
             PasswordEncoder passwordEncoder=new PasswordEncoder();
             String encoded=passwordEncoder.bCryptPasswordEncoder().encode(admin.getPassword());
             admin.setPassword(encoded);
             admin.setEnabled(true);
             adminRepo.save(admin);
+            imageProfilePicRepo.save(imgProfilePicAdmin);
 
             Size small=new Size("small");
             Size medium=new Size("medium");
@@ -188,11 +190,13 @@ public class MarketConfig {
             MemberShip memberShip5=new MemberShip("Premium");
 
 
-
+            ImgProfilePic imgProfilePicSeller=new ImgProfilePic();
             User user=new Seller("Mohammad",
                     "Derbas","mhammad_o_m@hotmail.com",
                     "123456","AskarCamp",
-                    "0592215224","P4270413",List.of(sellerRole),"MohammadDerbasPic");
+                    "0592215224","P4270413",List.of(sellerRole));
+            imgProfilePicSeller.setUser(user);
+
             String encoded1=passwordEncoder.bCryptPasswordEncoder().encode(user.getPassword());
             user.setPassword(encoded1);
             user.setEnabled(true);
@@ -204,15 +208,17 @@ public class MarketConfig {
 
 
             sellerRepo.save(user);
+            imageProfilePicRepo.save(imgProfilePicSeller);
             StoreHouse added1=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product.getId()),(Seller) user,product);
             StoreHouse added2=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product1.getId()),(Seller) user,product1);
 
             storeHouseRepo.saveAll(List.of(added1,added2));
-
+            ImgProfilePic imgProfilePicCustomer=new ImgProfilePic();
             User Mohammad=new Customer("Wajeeh",
                     "Salem","wajeehsalem@hotmail.com",
                     "momo654321","Jenin",
-                    "0598654321","P4270413",List.of(customerRole),"WajeehSaleemPic");
+                    "0598654321","P4270413",List.of(customerRole));
+            imgProfilePicCustomer.setUser(Mohammad);
             String encoded2=passwordEncoder.bCryptPasswordEncoder().encode(Mohammad.getPassword());
             Mohammad.setPassword(encoded2);
             Mohammad.setEnabled(true);
@@ -247,6 +253,8 @@ public class MarketConfig {
 
 
             customerRepo.save(Mohammad);
+            imageProfilePicRepo.save(imgProfilePicCustomer);
+
             Like like=new Like(new LikeId(Mohammad.getId(),product.getId()), (Customer) Mohammad,product);
             likeRepo.save(like);
             ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");

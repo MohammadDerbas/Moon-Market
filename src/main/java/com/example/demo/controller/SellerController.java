@@ -169,8 +169,8 @@ public List<Product> getProducts(Principal principal){
     }
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
     @PostMapping("{id}/update-image")
-    public void updateSellerImage(@PathVariable Long id,@RequestBody ImageDto image){
-        sellerServices.updateSellerImage(id,image);
+    public void updateSellerImage(@PathVariable Long id,@RequestParam("image")MultipartFile multipartFile) throws IOException {
+        sellerServices.updateSellerImage(id,multipartFile);
     }
 
     @GetMapping("/")

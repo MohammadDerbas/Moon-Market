@@ -32,8 +32,7 @@ public class User implements UserDetails {
 
     private Long id;
 
-    @JsonView({View.View1.class, View.View3.class})
-    private String profilePic;
+
 
 
     @Column(
@@ -105,7 +104,9 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "roleId"))
     private Collection<Role> roles;
-
+    @JsonView({View.View1.class, View.View3.class})
+    @OneToOne(mappedBy = "user")
+    ImgProfilePic imgProfilePic;
     public User() {
     }
 
@@ -114,7 +115,7 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles,String profilePic) {
+    public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -123,8 +124,6 @@ public class User implements UserDetails {
         this.phone = phone;
         this.postalCode = postalCode;
         this.roles=roles;
-        this.profilePic=profilePic;
-
 
     }
     public User(String firstName, String lastName, String email, String password, String address, String phone, String postalCode,Collection<Role> roles,Boolean enabled) {
@@ -288,12 +287,15 @@ public class User implements UserDetails {
         return new ArrayList<>();
     }
 
-    public String getProfilePic() {
-        return profilePic;
+
+
+
+    public ImgProfilePic getImgProfilePic() {
+        return imgProfilePic;
     }
 
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
+    public void setImgProfilePic(ImgProfilePic imgProfilePic) {
+        this.imgProfilePic = imgProfilePic;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.demo.repo;
 
+import com.example.demo.entity.ImgProfilePic;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.User;
 import org.springframework.data.domain.Example;
@@ -26,7 +27,7 @@ public interface UserRepo extends JpaRepository<User,Long> {
     int enableAppUser(String email);
     @Transactional
     @Modifying
-    @Query("update User u set u.profilePic=?1")
-    void updateUserImage(String image);
+    @Query("update User u set u.imgProfilePic=?1")
+    void updateUserImage(ImgProfilePic imageProfilePic);
 
 }

@@ -94,8 +94,8 @@ public class Customer extends User  {
     public Customer() {
     }
 
-    public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles,String profilePic) {
-        super( firstName, lastName, email, password, address, phone, postalCode,roles,profilePic);
+    public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
+        super( firstName, lastName, email, password, address, phone, postalCode,roles);
         this.activate = true;
         this.points = 0;
         this.reportCounter = 0;

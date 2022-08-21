@@ -22,14 +22,18 @@ public class EmailService implements EmailSender {
         this.mailSender = mailSender;
     }
 
-    @Override
     @Async
-    public void send(String to, String email)  {
+    public void send(String to, String email,String check)  {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setText(email, true);
             helper.setTo(to);
+            if(check.equals("Reset")){
+                helper.setSubject("rest password");
+
+            }
+            else
             helper.setSubject("confirm your email");
             helper.setFrom("mohammad.derbas@gmail.com");
             mailSender.send(mimeMessage);
@@ -40,4 +44,6 @@ public class EmailService implements EmailSender {
         }
 
     }
+
+
 }

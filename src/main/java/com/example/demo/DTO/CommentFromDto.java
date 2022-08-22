@@ -1,8 +1,12 @@
 package com.example.demo.DTO;
 
-import java.time.LocalDate;
+import com.example.demo.entity.User;
+import com.example.demo.repo.CustomerRepo;
+import com.example.demo.repo.UserRepo;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CommentFromDto {
     public Long id;
@@ -10,6 +14,7 @@ public class CommentFromDto {
     public Double rating;
     public String from;
     public LocalDateTime time;
+    public String img;
 
     public CommentFromDto() {
     }
@@ -18,16 +23,18 @@ public class CommentFromDto {
         this.comment = comment;
         this.from = fromCustomer;
 
+
     }
 
     public CommentFromDto(String comment, String fromCustomer,Double rating) {
         this.comment = comment;
         this.from = fromCustomer;
         this.rating=rating;
+        this.img=img;
 
     }
 
-    public CommentFromDto(Long id, String comment, String from,Double rating) {
+    public CommentFromDto(Long id, String comment, String from,Double rating ) {
         this.id = id;
         this.comment = comment;
         this.from = from;
@@ -64,7 +71,16 @@ public Double getRating(){return this.rating;}
     public String getFrom() {
         return from;
     }
+public void setImg(String url){
 
+
+ this.img=url;
+
+}
+
+    public String getImg() {
+        return img;
+    }
 
     public void setFrom(String from) {
         this.from = from;
@@ -97,6 +113,8 @@ public Double getRating(){return this.rating;}
                 "comment='" + comment + '\'' +
                 ", from='" + from + '\'' +
                 ", rating='" + rating + '\'' +
+                ", image='" + img + '\'' +
+
 
                 '}';
     }

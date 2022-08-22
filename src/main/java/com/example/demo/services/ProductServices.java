@@ -94,7 +94,7 @@ public class ProductServices {
         return productRepo.findAll();
     }
 
-    public List<Product> filter(String categoury, String color, List<String> size, String type, String brand,  Integer s, Integer e) {
+    public List<Product>  filter(String categoury, String color, List<String> size, String type, String brand,  Integer s, Integer e) {
         List<Product>filterProduct1=new ArrayList<>();
 
         ArrayList<ArrayList<Product>>  arr=new ArrayList<>();
@@ -105,14 +105,14 @@ public class ProductServices {
         arr.add((ArrayList<Product>) filterProduct1);
 
         if (categoury != null && categoury.length() > 0) {
-            catPro= (ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getCategory().getCategory().equals(categoury)).collect(Collectors.toList());
+            catPro= (ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getCategory().getCategory().equalsIgnoreCase(categoury)).collect(Collectors.toList());
             arr.add(catPro);
 
 
         }
         if (color!= null && color.length() > 0) {
             catPro=(ArrayList<Product>) arr.get(arr.size()-1).stream()
-                    .filter(product -> product.getColorProps().stream().anyMatch(colorProps -> colorProps.getColor().equals(color))).collect(Collectors.toList());
+                    .filter(product -> product.getColorProps().stream().anyMatch(colorProps -> colorProps.getColor().equalsIgnoreCase(color))).collect(Collectors.toList());
             arr.add(catPro);
 
         }
@@ -144,14 +144,14 @@ public class ProductServices {
         }
         if (type != null && type.length() > 0) {
 
-            catPro=(ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getType().getType().equals(type)).collect(Collectors.toList());
+            catPro=(ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getType().getType().equalsIgnoreCase(type)).collect(Collectors.toList());
             arr.add(catPro);
 
 
         }
         if (brand != null && brand.length() > 0) {
 
-            catPro=(ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getBrand().getBrand().equals(brand)).collect(Collectors.toList());
+            catPro=(ArrayList<Product>) arr.get(arr.size()-1).stream().filter(product -> product.getBrand().getBrand().equalsIgnoreCase(brand)).collect(Collectors.toList());
             arr.add(catPro);
 
 

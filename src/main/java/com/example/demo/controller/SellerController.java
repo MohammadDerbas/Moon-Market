@@ -221,7 +221,7 @@ public List<Product> getProducts(Principal principal){
   @GetMapping("/orders/check")
   public Integer getPendingOrdersCount(Principal principal){return  sellerServices.getPendingOrders(principal.getName());}
     @PutMapping("/orders")
-    public void getSellerOrders(@RequestParam String status, @RequestParam String reference){ sellerServices.updateOrderStatus(status,UUID.fromString(reference));}
+    public void getSellerOrders(@RequestParam String status, @RequestParam String reference){ sellerServices.updateOrderStatus(status, UUID.fromString(reference));}
     @GetMapping("/{id}/follower")
     @JsonView(View.View1.class)
     public List showFollower(@PathVariable Long id){

@@ -2,6 +2,7 @@ package com.example.demo.security.config;
 
 import com.example.demo.services.UserServices;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -33,7 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
+
                 .antMatchers("/registration/**").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .anyRequest()
                 .authenticated().and()
                 .formLogin()

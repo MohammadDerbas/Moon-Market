@@ -90,6 +90,10 @@ public class Customer extends User  {
     )
     @JsonIgnore
     private List <SellerComment> sellerComments=new ArrayList<>();
+    @OneToMany(
+            mappedBy = "customer"
+    )
+    private List<PrizeChanger> prizeChangers=new ArrayList<>();
 
     public Customer() {
     }
@@ -97,9 +101,10 @@ public class Customer extends User  {
     public Customer(String firstName, String lastName, String email, String password, String address, String phone, String postalCode, Collection<Role> roles) {
         super( firstName, lastName, email, password, address, phone, postalCode,roles);
         this.activate = true;
-        this.points = 0;
         this.reportCounter = 0;
         this.customerPurchases = 0.0;
+        this.points =  (int)(customerPurchases*.05);
+
 
     }
 

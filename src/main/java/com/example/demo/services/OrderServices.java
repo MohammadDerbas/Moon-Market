@@ -24,14 +24,16 @@ public class OrderServices {
     private final ProductRepo productRepo;
     private final PurchaseRepo purchaseRepo;
     private final CustomerRepo customerRepo;
+    private final MemberShipRepo memberShipRepo;
 
     @Autowired
-    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo, ProductRepo productRepo, PurchaseRepo purchaseRepo, CustomerRepo customerRepo) {
+    public OrderServices(OrderRepo orderRepo, SellerRepo sellerRepo, ProductRepo productRepo, PurchaseRepo purchaseRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo) {
         this.orderRepo = orderRepo;
         this.sellerRepo = sellerRepo;
         this.productRepo = productRepo;
         this.purchaseRepo = purchaseRepo;
         this.customerRepo = customerRepo;
+        this.memberShipRepo = memberShipRepo;
     }
     public List<CustomerProductDTO> showOrders() {
             return orderRepo.findAll().stream().map(this::convertEntityToDto).collect(Collectors.toList());
@@ -85,9 +87,37 @@ public class OrderServices {
         orderRepo.updateQuantity(quantity,new OrderId(id,id2));
     }
     public void buyOrders(Long id){
+        Integer purchase;
+        AtomicReference<MemberShip> memberShip = new AtomicReference<>(new MemberShip("error"));
         Optional<Customer> customer=customerRepo.findUserByID(id);
         orderRepo.findAlLOrdersByCustomer_Id(id).stream().forEach(order -> {purchaseRepo.save(new Purchase(order.getCustomer().getId(),order.getProduct().getId(),order.getDate(),order.getPrice(),order.getQuantity()));
-                customer.get().setCustomerPurchases(customer.get().getCustomerPurchases()+order.getPrice());}
+                customer.get().setCustomerPurchases(customer.get().getCustomerPurchases()+order.getPrice());
+                customer.get().setPoints((int)((customer.get().getCustomerPurchases()+order.getPrice())*.05));
+                if((customer.get().getCustomerPurchases())<500){
+                    System.out.println("bronze");
+                    memberShip.set(memberShipRepo.findByType("bronze"));
+                    memberShip.get().addCustomer(customer.get());
+                    memberShipRepo.save(memberShip.get()) ;}
+                if((customer.get().getCustomerPurchases())<1000){
+                    System.out.println("silver");
+                    memberShip.set(memberShipRepo.findByType("Silver"));
+                memberShip.get().addCustomer(customer.get());
+                   memberShipRepo.save(memberShip.get()) ;}
+                if((customer.get().getCustomerPurchases())<2000){
+                    System.out.println("golden");
+
+                    memberShip.set(memberShipRepo.findByType("Golden"));
+                    memberShip.get().addCustomer(customer.get());
+                    memberShipRepo.save(memberShip.get()) ;}
+                if((customer.get().getCustomerPurchases())>=2000) {
+                    System.out.println(customer.get().getCustomerPurchases()+order.getPrice());
+                    System.out.println("premium");
+
+                    memberShip.set(memberShipRepo.findByType("Premium"));
+                    memberShip.get().addCustomer(customer.get());
+                    memberShipRepo.save(memberShip.get());
+                }
+        }
         );
     }
 

@@ -31,14 +31,13 @@ public class SellerServices {
     private final SellerCommentRepo sellerCommentRepo;
     private final FollowRepo followRepo;
     private final ColorPropsRepo colorPropsRepo;
-    private final ImagesRepo imagesRepo;
     private final CustomerRepo customerRepo;
     private final LikeRepo likeRepo;
     private final ProductCommentRepo productCommentRepo;
     private final ImgRepo imgRepo;
 
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo, ImgRepo imgRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo,  CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo, ImgRepo imgRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -50,7 +49,6 @@ public class SellerServices {
         this.sellerCommentRepo = sellerCommentRepo;
         this.followRepo = followRepo;
         this.colorPropsRepo = colorPropsRepo;
-        this.imagesRepo = imagesRepo;
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
         this.productCommentRepo = productCommentRepo;
@@ -408,37 +406,7 @@ dto.setRating(sellerComment.getRating());
         }
     }
 
-    public void addSellerImageProductWithId(Long id, Long id2, ColorPropsDTO colorPropsDTO) {
-        boolean exist = sellerRepo.existsById(id);
-        if (!exist) {
-            throw new ApiRequestException("seller with id" + id + "does not exist");
-        }
-        boolean exist1 = productRepo.existsById(id2);
-        if (!exist1) {
-            throw new ApiRequestException("product with id" + id + "does not exist");
-        }
-        boolean exist2 = colorPropsRepo.existsByColor(colorPropsDTO.getColor(), id2);
-        if (exist2) {
-            boolean exist3 = imagesRepo.existsByImages(colorPropsDTO.getImages());
-            if (exist3) {
-                throw new ApiRequestException("image does not exist for this product");
-            }
-            ColorProps colorProps = colorPropsRepo.findByColor(colorPropsDTO.getColor(), id2);
-            Images images = new Images(colorPropsDTO.getImages());
-            images.setColorProps(colorProps);
-            imagesRepo.save(images);
 
-
-        } else {
-            ColorProps colorProps = new ColorProps(colorPropsDTO.getColor());
-            colorProps.setProduct(productRepo.findProductById(id2));
-            colorPropsRepo.save(colorProps);
-            Images images = new Images(colorPropsDTO.getImages());
-            images.setColorProps(colorProps);
-            imagesRepo.save(images);
-        }
-
-    }
 
     public void updateSellerImage(Long id, MultipartFile multipartFile) throws IOException {
         boolean exist = sellerRepo.existsById(id);

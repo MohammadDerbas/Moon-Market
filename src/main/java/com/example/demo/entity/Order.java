@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity(name="Cart")
 @Table(name="cart")
@@ -16,6 +17,8 @@ public class Order {
 
     private Customer customer;
 
+
+
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "product_id",
@@ -24,6 +27,7 @@ public class Order {
     @Column(
             name="date"
     )
+
     private LocalDate date=LocalDate.now();
     private Integer quantity;
     private String status="PENDING";
@@ -35,6 +39,8 @@ public class Order {
     private  String color;
 
     private Double price;
+    private UUID reference=UUID.randomUUID();
+
 
     public Order() {
     }
@@ -168,7 +174,9 @@ public class Order {
         this.price = price;
     }
 
-
+    public UUID getReference() {
+        return reference;
+    }
 
     @Override
     public String toString() {

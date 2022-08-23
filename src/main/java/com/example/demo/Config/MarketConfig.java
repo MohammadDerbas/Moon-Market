@@ -152,33 +152,21 @@ public class MarketConfig {
             colorProps7.setProduct(product1);
 
             colorPropsRepo.saveAll(List.of(colorProps1,colorProps2,colorProps3,colorProps4,colorProps5,colorProps6,colorProps7));
-            Images images1=new Images("p1imgBlue1");
+            Images images1=new Images("https://static.zara.net/photos///2022/I/0/1/p/8246/241/400/2/w/480/8246241400_6_1_1.jpg?ts=1654586460306");
             images1.setColorProps(colorProps1);
-            Images images2=new Images("p1imgBlue2");
+            Images images2=new Images("https://static.zara.net/photos///2022/I/0/1/p/8246/243/526/2/w/385/8246243526_6_1_1.jpg?ts=1654586461253");
             images2.setColorProps(colorProps1);
-            Images images3=new Images("p1imgRed1");
+            Images images3=new Images("https://static.zara.net/photos///2022/V/0/1/p/6045/023/406/2/w/385/6045023406_6_1_1.jpg?ts=1642498964106");
             images3.setColorProps(colorProps2);
-            Images images4=new Images("p1imgRed2");
-            images4.setColorProps(colorProps2);
 
-            Images images5=new Images("p2imgBlue1");
+            Images images5=new Images("https://static.zara.net/photos///2022/I/0/1/p/6840/089/406/2/w/378/6840089406_6_1_1.jpg?ts=1658413489985");
             images5.setColorProps(colorProps3);
-            Images images6=new Images("p2imgBlue2");
-            images6.setColorProps(colorProps3);
-            Images images7=new Images("p2imgRed1");
+            Images images7=new Images("https://static.zara.net/photos///2022/I/2/1/p/4550/512/999/2/w/378/4550512999_6_1_1.jpg?ts=1657273374505");
             images7.setColorProps(colorProps4);
-            Images images8=new Images("p2imgRed2");
-            images8.setColorProps(colorProps4);
-
-            Images images9=new Images("pimgRed1");
-            images9.setColorProps(colorProps5);
-            Images images10=new Images("pimgGreen1");
-            images10.setColorProps(colorProps6);
-            Images images11=new Images("pimgBlue1");
-            images11.setColorProps(colorProps7);
 
 
-            imagesRepo.saveAll(List.of(images1,images2,images3,images4,images5,images6,images7,images8,images9,images10,images11));
+
+            imagesRepo.saveAll(List.of(images1,images2,images3,images5,images7));
 
 
 
@@ -243,6 +231,7 @@ public class MarketConfig {
             /*System.out.println(purchase.getId());*/
             System.out.println(product.getId());
             Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product,2);
+
             orderRepo.save(order);
             Mohammad.addToCart(order);
            /* Mohammad.addPurchase(purchase);

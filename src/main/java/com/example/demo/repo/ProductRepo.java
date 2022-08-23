@@ -29,4 +29,7 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
     void updateQuantity(Integer newQuantity,Long id);
     @Query("select p from Product p where p.category.category = ?1")
     List<Product> findProductByCategory(String category);
+
+    @Query("SELECT s.id FROM Product s where s.id in (SELECT m.id.productId from StoreHouse m where m.id.sellerId=?1)")
+    List<Long> showProductIdsWithSpecificSeller( long id);
 }

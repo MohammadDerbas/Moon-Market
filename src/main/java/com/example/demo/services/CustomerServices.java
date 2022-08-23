@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +51,10 @@ public class CustomerServices {
         return customer;
     }
 
-    public void updateCustomerInfo(Long id,  String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
+    public void updateCustomerInfo(String name,  String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
+
+       Long id=customerRepo.findUserByEmail(name).get().getId();
+
         boolean exists = userRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Customer with id " + id + "does not exist");
@@ -131,7 +135,8 @@ public class CustomerServices {
     }
 
 
-    public List showOrders(Long id) {
+    public List showOrders(String name) {
+        Long id = customerRepo.findUserByEmail(name).get().getId();
         boolean exist = customerRepo.existsById(id);
         if (!exist) {
             throw new ApiRequestException("customer with id" + id + "does not exist");
@@ -202,7 +207,15 @@ public class CustomerServices {
 
     }
     private CustomerProductDTO convertEntityToDto(Order order){
+        AtomicReference<String> imgurl= new AtomicReference<>("https://static.zara.net/photos///2022/I/0/1/p/2569/263/400/2/w/385/2569263400_6_1_1.jpg?ts=1660213342477");
+        order.getProduct().getColorProps().forEach(colorProps -> {
+           if(colorProps.getColor()==order.getColor()){
+           imgurl.set(colorProps.getImages().get(0).getUrl());
+           }
+        });
         CustomerProductDTO customerProductDTO=new CustomerProductDTO();
+        customerProductDTO.setReference(order.getReference());
+        customerProductDTO.setImgUrl(String.valueOf(imgurl));
         customerProductDTO.setUserId(order.getCustomer().getId());
         customerProductDTO.setFirstName(order.getCustomer().getFirstName());
         customerProductDTO.setLastName(order.getCustomer().getLastName());
@@ -211,9 +224,12 @@ public class CustomerServices {
         customerProductDTO.setPhone(order.getCustomer().getPhone());
         customerProductDTO.setDescription(order.getProduct().getDescription());
         customerProductDTO.setBrand(order.getProduct().getBrand());
-        customerProductDTO.setSize(order.getProduct().getSizes());
+        customerProductDTO.setDate((order.getDate()));
+        customerProductDTO.setSize(order.getSize());
+        customerProductDTO.setColor(order.getColor());
+        customerProductDTO.setStatus(order.getStatus());
         customerProductDTO.setProductId(order.getProduct().getId());
-        customerProductDTO.setPrice(order.getProduct().getPrice());
+        customerProductDTO.setPrice(order.getPrice());
         customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));
         return customerProductDTO;
     }
@@ -231,12 +247,15 @@ public class CustomerServices {
     }
 
 
-    public List showCustomerFollowing(Long id) {
-            boolean exist = customerRepo.existsById(id);
+    public List showCustomerFollowing(String name) {
+
+
+            boolean exist = customerRepo.existsByEmail(name);
             if (!exist) {
-                throw new ApiRequestException("customer with id" + id + "does not exist");
+                throw new ApiRequestException("customer with id does not exist");
             }
-        return followRepo.findSellerByCustomerId(id);
+            Customer customer= (Customer) customerRepo.findUserByEmail(name).get();
+        return followRepo.findSellerByCustomerId(customer.getId());
     }
 
 
@@ -252,5 +271,11 @@ public class CustomerServices {
 
     public List showCustomerLikedProduct(Long id) {
         return likeRepo.findProductByCustomerId(id);
+    }
+
+    public Customer getMyInfo(String name) {
+
+
+        return (Customer) customerRepo.findUserByEmail(name).get();
     }
 }

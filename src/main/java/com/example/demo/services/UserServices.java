@@ -76,7 +76,7 @@ public class UserServices implements UserDetailsService {
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(customer.getPassword());
         customer.setPassword(encodedPassword);
         userRepo.save(customer);
-        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename());
+        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/get/profile_pic/"+multipartFile.getOriginalFilename());
         imgProfilePic.setUser(customer);
         imageProfilePicRepo.save(imgProfilePic);
         String token= UUID.randomUUID().toString();
@@ -104,7 +104,7 @@ public class UserServices implements UserDetailsService {
         String encodedPassword = passwordEncoder.bCryptPasswordEncoder().encode(seller.getPassword());
         seller.setPassword(encodedPassword);
         userRepo.save(seller);
-        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/profile_pic/image/"+multipartFile.getOriginalFilename());
+        ImgProfilePic imgProfilePic=new ImgProfilePic(multipartFile.getOriginalFilename(),multipartFile.getContentType(), ImageUtility.compressImage(multipartFile.getBytes()),"http://localhost:8080/img/get/profile_pic/" +multipartFile.getOriginalFilename());
         imgProfilePic.setUser(seller);
         imageProfilePicRepo.save(imgProfilePic);
         String token= UUID.randomUUID().toString();

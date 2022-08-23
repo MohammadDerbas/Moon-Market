@@ -43,18 +43,26 @@ public class CustomerController {
     public Optional<Customer> infoCustomer(@PathVariable Long id) {
         return customerServices.getInfoCustomer(id);
     }
+    @GetMapping ("/info")
+    @JsonView(View.View3.class)
+    public Customer getCustomerInfo(Principal principal) {
+        return customerServices.getMyInfo(principal.getName());
+    }
 
-    @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
-    @PutMapping("/{id}/update")
-    public void updateCustomerInfo(@PathVariable Long id,
+
+
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PutMapping("/update")
+    public void updateCustomerInfo(
                                    @RequestParam(required = false) String firstName,
                                    @RequestParam(required = false) String lastName,
                                    @RequestParam(required = false) String email,
                                    @RequestParam(required = false) String password,
                                    @RequestParam(required = false) String address,
                                    @RequestParam(required = false) String phone,
-                                   @RequestParam(required = false) String postalCode) {
-        customerServices.updateCustomerInfo(id, firstName, lastName, email, password, address, phone, postalCode);
+                                   @RequestParam(required = false) String postalCode
+    ,Principal principal) {
+        customerServices.updateCustomerInfo(principal.getName(), firstName, lastName, email, password, address, phone, postalCode);
     }
     @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
     @GetMapping("/{id}/order-product/{id2}")
@@ -67,18 +75,18 @@ public class CustomerController {
     public void deleteOrder(@PathVariable Long id, @PathVariable Long id2) {
         customerServices.deleteOrder(id, id2);
     }
-    @PreAuthorize("hasAuthority('CUSTOMER')and #id==authentication.principal.id")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
 
-    @GetMapping("/{id}/orders")
-    public List showOrders(@PathVariable Long id) {
-        return customerServices.showOrders(id);
+    @GetMapping("/orders")
+    public List showOrders(Principal principal) {
+        return customerServices.showOrders(principal.getName());
     }
 
-    @GetMapping("/{id}/following")
+    @GetMapping("/following")
     @PreAuthorize("hasAuthority('CUSTOMER_READ')")
     @JsonView(View.View1.class)
-    public List showFollowing(@PathVariable Long id){
-        return customerServices.showCustomerFollowing(id);
+    public List showFollowing(Principal principal){
+        return customerServices.showCustomerFollowing(principal.getName());
     }
 
     @GetMapping("/{id}/liked-product")

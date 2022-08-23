@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface OrderRepo extends JpaRepository <Order,Long> {
@@ -22,9 +23,15 @@ public interface OrderRepo extends JpaRepository <Order,Long> {
     List<Product> findAlLProductByCustomer_Id(Long id);
     @Query("select c from Cart c where c.customer.id = ?1")
     List<Order> findAlLOrdersByCustomer_Id(Long id);
+    @Query("select c from Cart  c where  c.product.id IN ?1")
+    List<Order> getSellerOrdersByProductIds(List<Long> productIds);
 
     @Query("select distinct c.customer from Cart c")
     List<Customer>  findAllCustomer();
+    @Query("select c  from Cart c where c.reference=?1")
+    Order  getOrderByReference(UUID ref);
+    @Query("select COUNT(c) from Cart c where c.product.id IN ?1 and c.status='PENDING' ")
+    Integer getPendingOrdersCount(List<Long> ids);
 
 
     @Transactional

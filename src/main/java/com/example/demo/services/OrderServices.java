@@ -58,7 +58,7 @@ public class OrderServices {
         customerProductDTO.setPhone(order.getCustomer().getPhone());
         customerProductDTO.setDescription(order.getProduct().getDescription());
         customerProductDTO.setBrand(order.getProduct().getBrand());
-        customerProductDTO.setSize(order.getProduct().getSizes());
+        customerProductDTO.setSize(order.getSize());
         customerProductDTO.setProductId(order.getProduct().getId());
         customerProductDTO.setPrice(order.getProduct().getPrice());
         customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));

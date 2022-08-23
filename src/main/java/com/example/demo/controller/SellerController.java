@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("seller")
@@ -62,10 +63,10 @@ public class SellerController {
         sellerServices.addFollow(id,follow,principal.getName());
     }
 
-    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
+    @PreAuthorize("hasAuthority('SELLER') ")
 
-    @PutMapping("/{id}/update")
-    public void updateSellerInfo(@PathVariable Long id,
+    @PutMapping("/update")
+    public void updateSellerInfo(Principal principal,
                                  @RequestParam(required = false) String firstName,
                                  @RequestParam(required = false) String lastName,
                                  @RequestParam(required = false) String email,
@@ -73,7 +74,7 @@ public class SellerController {
                                  @RequestParam(required = false) String address,
                                  @RequestParam(required = false) String phone,
                                  @RequestParam(required = false) String postalCode) {
-        sellerServices.updateSellerInfo(id, firstName, lastName, email, password, address, phone, postalCode);
+        sellerServices.updateSellerInfo(principal.getName(), firstName, lastName, email, password, address, phone, postalCode);
     }
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
     @PostMapping(value = "{id}/product/add",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -219,9 +220,16 @@ public List<Product> getProducts(Principal principal){
     public List<CommentFromDto> showComments(Principal principal) {
         return sellerServices.showComments(principal.getName());
     }
+    @GetMapping("/orders")
+    public List<CustomerProductDTO> getSellerOrders(Principal principal){return sellerServices.getSellerOrders(principal.getName());}
+  @GetMapping("/orders/check")
+  public Integer getPendingOrdersCount(Principal principal){return  sellerServices.getPendingOrders(principal.getName());}
+    @PutMapping("/orders")
+    public void getSellerOrders(@RequestParam String status, @RequestParam String reference){ sellerServices.updateOrderStatus(status,UUID.fromString(reference));}
     @GetMapping("/{id}/follower")
     @JsonView(View.View1.class)
     public List showFollower(@PathVariable Long id){
         return sellerServices.showSellerFollower(id);
     }
+
 }

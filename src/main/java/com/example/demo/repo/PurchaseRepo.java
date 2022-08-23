@@ -1,5 +1,6 @@
 package com.example.demo.repo;
 
+import com.example.demo.entity.Product;
 import com.example.demo.entity.Purchase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,5 +25,7 @@ public interface PurchaseRepo extends JpaRepository<Purchase, Long> {
     List<Purchase> findAllPurchasesByMonth(Integer month,Integer year);
     @Query(value = "select * from purchase  WHERE  extract(YEAR from purchase.date)=?1 ",nativeQuery = true)
     List<Purchase> findAllPurchasesByYear(Integer year);
+    @Query("SELECT s from Product s where s.id in (select t.productId from Purchase t where t.customerId in (select p.customerId from Purchase p where p.productId=?1)) ")
+    List<Product>familiarProduct(Long id);
 
 }

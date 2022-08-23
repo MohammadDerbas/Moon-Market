@@ -163,11 +163,7 @@ public List<Product> getProducts(Principal principal){
     public void deleteSellerImageProductWithId(@PathVariable Long id,@PathVariable Long id2 ,@RequestBody ColorPropsDTO colorPropsDTO){
         sellerServices.deleteSellerImageProductWithId(id,id2,colorPropsDTO);
     }
-    @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
-    @PostMapping("{id}/product/{id2}/add-image")
-    public void addSellerImageProductWithId(@PathVariable Long id,@PathVariable Long id2 ,@RequestBody ColorPropsDTO colorPropsDTO){
-        sellerServices.addSellerImageProductWithId(id,id2,colorPropsDTO);
-    }
+
     @PreAuthorize("hasAuthority('SELLER') and #id==authentication.principal.id")
     @PostMapping("{id}/update-image")
     public void updateSellerImage(@PathVariable Long id,@RequestParam("image")MultipartFile multipartFile) throws IOException {

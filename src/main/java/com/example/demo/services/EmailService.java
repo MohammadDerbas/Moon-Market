@@ -29,7 +29,11 @@ public class EmailService implements EmailSender {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setText(email, true);
             helper.setTo(to);
-            if(check.equals("Reset")){
+            if(check.equals("enable")){
+                helper.setSubject("enable account");
+
+            }
+            else if(check.equals("Reset")){
                 helper.setSubject("rest password");
 
             }

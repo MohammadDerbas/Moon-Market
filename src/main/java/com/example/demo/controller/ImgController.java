@@ -86,7 +86,8 @@ public class ImgController {
     @GetMapping(path = {"/get/profile_pic/{name}"})
     public ResponseEntity<byte[]> getProfileImage(@PathVariable("name") String name) throws IOException {
 
-        final Optional<ImgProfilePic> dbImage = imageProfilePicRepo.findByName(name);
+        final Optional<ImgProfilePic> dbImage = imageProfilePicRepo
+                .findByName(name);
 
         return ResponseEntity
                 .ok()

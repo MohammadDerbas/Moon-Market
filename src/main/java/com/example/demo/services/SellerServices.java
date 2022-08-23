@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -29,15 +31,13 @@ public class SellerServices {
     private final SellerCommentRepo sellerCommentRepo;
     private final FollowRepo followRepo;
     private final ColorPropsRepo colorPropsRepo;
-    private final ImagesRepo imagesRepo;
     private final CustomerRepo customerRepo;
     private final LikeRepo likeRepo;
     private final ProductCommentRepo productCommentRepo;
     private final ImgRepo imgRepo;
-    private final OrderRepo orderRepo;
 
     @Autowired
-    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo, ImagesRepo imagesRepo, CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo, ImgRepo imgRepo, OrderRepo orderRepo) {
+    public SellerServices(SellerRepo sellerRepo, @Qualifier("sellerRepo") UserRepo userRepo, StoreHouseRepo storeHouseRepo, ProductRepo productRepo, BrandRepo brandRepo, TypeRepo typeRepo, CategoryRepo categoryRepo, SizeRepo sizeRepo, SellerCommentRepo sellerCommentRepo, FollowRepo followRepo, ColorPropsRepo colorPropsRepo,  CustomerRepo customerRepo, LikeRepo likeRepo, ProductCommentRepo productCommentRepo, ImgRepo imgRepo) {
         this.sellerRepo = sellerRepo;
         this.userRepo = userRepo;
         this.storeHouseRepo = storeHouseRepo;
@@ -49,12 +49,10 @@ public class SellerServices {
         this.sellerCommentRepo = sellerCommentRepo;
         this.followRepo = followRepo;
         this.colorPropsRepo = colorPropsRepo;
-        this.imagesRepo = imagesRepo;
         this.customerRepo = customerRepo;
         this.likeRepo = likeRepo;
         this.productCommentRepo = productCommentRepo;
         this.imgRepo = imgRepo;
-        this.orderRepo = orderRepo;
     }
 
     public Product getInfoSellerProductWithId(Long id, Long id2) {
@@ -92,9 +90,7 @@ public class SellerServices {
 
     }
 
-    public void updateSellerInfo(String name, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
-
-       Long id =sellerRepo.findUserByEmail(name).get().getId();
+    public void updateSellerInfo(Long id, String firstName, String lastName, String email, String password, String address, String phone, String postalCode) {
         boolean exists = userRepo.existsById(id);
         if (!exists) {
             throw new ApiRequestException("Seller with id " + id + "does not exist");
@@ -413,37 +409,7 @@ dto.setRating(sellerComment.getRating());
         }
     }
 
-    public void addSellerImageProductWithId(Long id, Long id2, ColorPropsDTO colorPropsDTO) {
-        boolean exist = sellerRepo.existsById(id);
-        if (!exist) {
-            throw new ApiRequestException("seller with id" + id + "does not exist");
-        }
-        boolean exist1 = productRepo.existsById(id2);
-        if (!exist1) {
-            throw new ApiRequestException("product with id" + id + "does not exist");
-        }
-        boolean exist2 = colorPropsRepo.existsByColor(colorPropsDTO.getColor(), id2);
-        if (exist2) {
-            boolean exist3 = imagesRepo.existsByImages(colorPropsDTO.getImages());
-            if (exist3) {
-                throw new ApiRequestException("image does not exist for this product");
-            }
-            ColorProps colorProps = colorPropsRepo.findByColor(colorPropsDTO.getColor(), id2);
-            Images images = new Images(colorPropsDTO.getImages());
-            images.setColorProps(colorProps);
-            imagesRepo.save(images);
 
-
-        } else {
-            ColorProps colorProps = new ColorProps(colorPropsDTO.getColor());
-            colorProps.setProduct(productRepo.findProductById(id2));
-            colorPropsRepo.save(colorProps);
-            Images images = new Images(colorPropsDTO.getImages());
-            images.setColorProps(colorProps);
-            imagesRepo.save(images);
-        }
-
-    }
 
     public void updateSellerImage(Long id, MultipartFile multipartFile) throws IOException {
         boolean exist = sellerRepo.existsById(id);
@@ -774,67 +740,6 @@ updateSellerRating(sellerId);
         }
         Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
         return showSellerComment(seller.getId());
-
-    }
-
-    public List<CustomerProductDTO> getSellerOrders(String name) {
-
-        Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
-
-        List<Long> productId=productRepo.showProductIdsWithSpecificSeller(seller.getId());
-
-
-        return orderRepo.getSellerOrdersByProductIds(productId).stream().map(this::convertEntityToDto).collect(Collectors.toList());
-
-    }
-
-    private CustomerProductDTO convertEntityToDto(Order order){
-        AtomicReference<String> imgurl= new AtomicReference<>("https://static.zara.net/photos///2022/I/0/1/p/2569/263/400/2/w/385/2569263400_6_1_1.jpg?ts=1660213342477");
-        order.getProduct().getColorProps().forEach(colorProps -> {
-            if(colorProps.getColor()==order.getColor()){
-                imgurl.set(colorProps.getImages().get(0).getUrl());
-            }
-        });
-        CustomerProductDTO customerProductDTO=new CustomerProductDTO();
-        customerProductDTO.setReference(order.getReference());
-        customerProductDTO.setImgUrl(String.valueOf(imgurl));
-        customerProductDTO.setUserId(order.getCustomer().getId());
-        customerProductDTO.setFirstName(order.getCustomer().getFirstName());
-        customerProductDTO.setLastName(order.getCustomer().getLastName());
-        customerProductDTO.setAddress(order.getCustomer().getAddress());
-        customerProductDTO.setPostalCode(order.getCustomer().getPostalCode());
-        customerProductDTO.setPhone(order.getCustomer().getPhone());
-        customerProductDTO.setDescription(order.getProduct().getDescription());
-        customerProductDTO.setBrand(order.getProduct().getBrand());
-        customerProductDTO.setDate((order.getDate()));
-        customerProductDTO.setSize(order.getSize());
-        customerProductDTO.setColor(order.getColor());
-        customerProductDTO.setStatus(order.getStatus());
-        customerProductDTO.setProductId(order.getProduct().getId());
-        customerProductDTO.setPrice(order.getPrice());
-        customerProductDTO.setQuantityOrder(orderRepo.quantity(order.getId()));
-        return customerProductDTO;
-    }
-
-    public void updateOrderStatus(String status, UUID reference) {
-
-        Order order=orderRepo.getOrderByReference(reference);
-        order.setStatus(status);
-
-            order.setUpdatedAt(LocalDate.now());
-
-
-        orderRepo.save(order);
-
-    }
-
-    public Integer getPendingOrders(String name){
-        Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
-
-        List <Long> productIds=productRepo.showProductIdsWithSpecificSeller(seller.getId());
-
-        return orderRepo.getPendingOrdersCount(productIds);
-
 
     }
 }

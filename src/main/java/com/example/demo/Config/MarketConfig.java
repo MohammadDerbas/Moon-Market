@@ -14,8 +14,9 @@ import java.util.List;
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo,ImageProfilePicRepo imageProfilePicRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo,ImageProfilePicRepo imageProfilePicRepo,PrizeRepo prizeRepo,PrizeChangerRepo prizeChangerRepo){
         return args -> {
+
             Privilege seller_read=new Privilege("SELLER_READ");
             Privilege seller_write=new Privilege("SELLER_WRITE");
             Privilege customer_read=new Privilege("CUSTOMER_READ");
@@ -101,7 +102,7 @@ public class MarketConfig {
 
 
 
-            Product product=new Product("Cotton T-shirt",30,  0.50);
+            Product product=new Product("Cotton T-shirt",30,  120.0);
             Product product2=new Product("Cotton Trouser",100,.100);
             List<Size>mix1=new ArrayList<>();
             List<Size>mix2=new ArrayList<>();
@@ -227,7 +228,7 @@ public class MarketConfig {
 
 
 
-            memberShip5.addCustomer((Customer) Mohammad);
+            memberShip2.addCustomer((Customer) Mohammad);
             memberShipRepo.saveAll(List.of(memberShip1,memberShip2,memberShip3,memberShip4,memberShip5));
             //Mohammad.addPurchase(new Purchase(new PurchaseId(1l,1l),Mohammad,product));
             Purchase purchase=new Purchase(3l,1l, LocalDate.of(2022,07,29),2.5,5);
@@ -242,7 +243,7 @@ public class MarketConfig {
             purchaseRepo.saveAll(List.of(purchase,purchase2,purchase3,purchase4,purchase5));
             /*System.out.println(purchase.getId());*/
             System.out.println(product.getId());
-            Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product,2);
+            Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product,15);
             orderRepo.save(order);
             Mohammad.addToCart(order);
            /* Mohammad.addPurchase(purchase);
@@ -253,8 +254,15 @@ public class MarketConfig {
 
 
             customerRepo.save(Mohammad);
-            imageProfilePicRepo.save(imgProfilePicCustomer);
 
+            imageProfilePicRepo.save(imgProfilePicCustomer);
+            Prize prize1=new Prize("50$ gift",500);
+            Prize prize2=new Prize("100$ gift",800);
+            Prize prize3=new Prize("150$ gift",1200);
+            Prize prize4=new Prize("ticket to Turkey",10000);
+            prizeRepo.saveAll(List.of(prize1,prize2,prize3,prize4));
+            PrizeChanger prizeChanger=new PrizeChanger(new PrizeChangerId(prize1.getId(),Mohammad.getId()),prize1, (Customer) Mohammad);
+            prizeChangerRepo.save(prizeChanger);
             Like like=new Like(new LikeId(Mohammad.getId(),product.getId()), (Customer) Mohammad,product);
             likeRepo.save(like);
             ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");

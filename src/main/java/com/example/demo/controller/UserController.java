@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.services.UserServices;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("user")
@@ -12,8 +13,10 @@ public class UserController {
     public UserController(UserServices userServices) {
         this.userServices = userServices;
     }
-
-    public void disableAccount(Long id){
-        userServices.disableAccount(id);
+    @GetMapping (value = "/disable")
+    public void disableAccount(Principal principal){
+        userServices.disableAccount(principal.getName());
     }
+    @GetMapping (value = "/enable")
+    public void enableAccount(@RequestParam("email")String email){userServices.enableUser(email);}
 }

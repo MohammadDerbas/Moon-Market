@@ -14,9 +14,8 @@ import java.util.List;
 @Configuration
 public class MarketConfig {
     @Bean
-    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ImagesRepo imagesRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo,ImageProfilePicRepo imageProfilePicRepo,PrizeRepo prizeRepo,PrizeChangerRepo prizeChangerRepo){
+    CommandLineRunner commandLineRunner(AdminRepo adminRepo,ProductRepo productRepo,RoleRepo roleRepo,PrivilegeRepo privilegeRepo, SizeRepo sizeRepo, TypeRepo typeRepo, ProductCommentRepo productCommentRepo, BrandRepo brandRepo, CustomerRepo customerRepo, MemberShipRepo memberShipRepo, PurchaseRepo purchaseRepo,  SellerRepo sellerRepo, OrderRepo orderRepo, CategoryRepo categoryRepo,  SellerCommentRepo sellerCommentRepo, FollowRepo followersRepo, StoreHouseRepo storeHouseRepo,ColorPropsRepo colorPropsRepo,LikeRepo likeRepo,ImageProfilePicRepo imageProfilePicRepo,PrizeRepo prizeRepo,PrizeChangerRepo prizeChangerRepo){
         return args -> {
-
             Privilege seller_read=new Privilege("SELLER_READ");
             Privilege seller_write=new Privilege("SELLER_WRITE");
             Privilege customer_read=new Privilege("CUSTOMER_READ");
@@ -41,15 +40,14 @@ public class MarketConfig {
             roleRepo.saveAll(List.of(adminRole,sellerRole,customerRole));
 
 
-            ImgProfilePic imgProfilePicAdmin=new ImgProfilePic();
             User admin=new Admin("Mohammad","Derbasco","1@gmail.com","password","Askar","0599599678","2555",List.of(adminRole));
-            imgProfilePicAdmin.setUser(admin);
             PasswordEncoder passwordEncoder=new PasswordEncoder();
             String encoded=passwordEncoder.bCryptPasswordEncoder().encode(admin.getPassword());
             admin.setPassword(encoded);
             admin.setEnabled(true);
             adminRepo.save(admin);
-            imageProfilePicRepo.save(imgProfilePicAdmin);
+
+
 
             Size small=new Size("small");
             Size medium=new Size("medium");
@@ -102,8 +100,7 @@ public class MarketConfig {
 
 
 
-            Product product=new Product("Cotton T-shirt",30,  120.0);
-            Product product2=new Product("Cotton Trouser",100,.100);
+
             List<Size>mix1=new ArrayList<>();
             List<Size>mix2=new ArrayList<>();
 
@@ -115,73 +112,14 @@ public class MarketConfig {
 
 
 
-
-            man_clothes.addProduct(product);
-            woman_clothes.addProduct(product2);
             categoryRepo.saveAll(List.of(man_clothes,woman_clothes,baby_clothes));
 
-            mix1.stream().forEach(size -> size.addProduct(product));
-            mix2.stream().forEach(size -> size.addProduct(product2));
+
             sizeRepo.saveAll(List.of(medium,small,large,x_large,xx_large,XS,S,M,L,XXL,XXXL,S24,S25,S26,S27,S28,S29,S30,S31,S32,S33,S34,S35,S36,S37,S38,S39,S40));
-            System.out.println(x_large.getProducts());
-            System.out.println("888888888888888888888");
-            t_shirt.addProduct(product);
-            jeans.addProduct(product2);
+
             typeRepo.saveAll(List.of(t_shirt,dress,shorts,sweater,jeans,trouser,jacket,blazer));
-            lacoste.addProduct(product);
-            hugo_boss.addProduct(product2);
+
             brandRepo.saveAll(List.of(lacoste,hugo_boss));
-
-            product.buy();
-            Product product1=new Product("white dress",20,2.0,List.of(small,large,medium),dress,lacoste,woman_clothes);
-            productRepo.saveAll(List.of(product,product1,product2));
-
-            ColorProps colorProps1=new ColorProps("Blue");
-            colorProps1.setProduct(product);
-            ColorProps colorProps2=new ColorProps("Red");
-            colorProps2.setProduct(product);
-            ColorProps colorProps3=new ColorProps("Blue");
-            colorProps3.setProduct(product2);
-            ColorProps colorProps4=new ColorProps("Red");
-            colorProps4.setProduct(product2);
-            ColorProps colorProps5=new ColorProps("Red");
-            colorProps5.setProduct(product1);
-            ColorProps colorProps6=new ColorProps("Green");
-            colorProps6.setProduct(product1);
-
-            ColorProps colorProps7=new ColorProps("Yellow");
-            colorProps7.setProduct(product1);
-
-            colorPropsRepo.saveAll(List.of(colorProps1,colorProps2,colorProps3,colorProps4,colorProps5,colorProps6,colorProps7));
-            Images images1=new Images("p1imgBlue1");
-            images1.setColorProps(colorProps1);
-            Images images2=new Images("p1imgBlue2");
-            images2.setColorProps(colorProps1);
-            Images images3=new Images("p1imgRed1");
-            images3.setColorProps(colorProps2);
-            Images images4=new Images("p1imgRed2");
-            images4.setColorProps(colorProps2);
-
-            Images images5=new Images("p2imgBlue1");
-            images5.setColorProps(colorProps3);
-            Images images6=new Images("p2imgBlue2");
-            images6.setColorProps(colorProps3);
-            Images images7=new Images("p2imgRed1");
-            images7.setColorProps(colorProps4);
-            Images images8=new Images("p2imgRed2");
-            images8.setColorProps(colorProps4);
-
-            Images images9=new Images("pimgRed1");
-            images9.setColorProps(colorProps5);
-            Images images10=new Images("pimgGreen1");
-            images10.setColorProps(colorProps6);
-            Images images11=new Images("pimgBlue1");
-            images11.setColorProps(colorProps7);
-
-
-            imagesRepo.saveAll(List.of(images1,images2,images3,images4,images5,images6,images7,images8,images9,images10,images11));
-
-
 
 
             MemberShip memberShip1=new MemberShip("No-MemberShip");
@@ -191,97 +129,12 @@ public class MarketConfig {
             MemberShip memberShip5=new MemberShip("Premium");
 
 
-            ImgProfilePic imgProfilePicSeller=new ImgProfilePic();
-            User user=new Seller("Mohammad",
-                    "Derbas","mhammad_o_m@hotmail.com",
-                    "123456","AskarCamp",
-                    "0592215224","P4270413",List.of(sellerRole));
-            imgProfilePicSeller.setUser(user);
 
-            String encoded1=passwordEncoder.bCryptPasswordEncoder().encode(user.getPassword());
-            user.setPassword(encoded1);
-            user.setEnabled(true);
-
-            //user.addProduct(added1);
-
-
-
-
-
-            sellerRepo.save(user);
-            imageProfilePicRepo.save(imgProfilePicSeller);
-            StoreHouse added1=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product.getId()),(Seller) user,product);
-            StoreHouse added2=new StoreHouse(new StoreHouseId(((Seller) user).getId(),product1.getId()),(Seller) user,product1);
-
-            storeHouseRepo.saveAll(List.of(added1,added2));
-            ImgProfilePic imgProfilePicCustomer=new ImgProfilePic();
-            User Mohammad=new Customer("Wajeeh",
-                    "Salem","wajeehsalem@hotmail.com",
-                    "momo654321","Jenin",
-                    "0598654321","P4270413",List.of(customerRole));
-            imgProfilePicCustomer.setUser(Mohammad);
-            String encoded2=passwordEncoder.bCryptPasswordEncoder().encode(Mohammad.getPassword());
-            Mohammad.setPassword(encoded2);
-            Mohammad.setEnabled(true);
-
-
-
-
-
-            memberShip2.addCustomer((Customer) Mohammad);
-            memberShipRepo.saveAll(List.of(memberShip1,memberShip2,memberShip3,memberShip4,memberShip5));
-            //Mohammad.addPurchase(new Purchase(new PurchaseId(1l,1l),Mohammad,product));
-            Purchase purchase=new Purchase(3l,1l, LocalDate.of(2022,07,29),2.5,5);
-            Purchase purchase2=new Purchase(3l,1l, LocalDate.of(2022,06,29),3.0,6);
-            Purchase purchase3=new Purchase(3l,1l, LocalDate.of(2022,06,24),4.5,9);
-            Purchase purchase4=new Purchase(3l,1l, LocalDate.of(2021,06,02),5.0,10);
-            Purchase purchase5=new Purchase(3l,1l, LocalDate.of(2021,06,24),2.0,4);
-            ((Customer) Mohammad).setCustomerPurchases(17.0);
-
-
-
-            purchaseRepo.saveAll(List.of(purchase,purchase2,purchase3,purchase4,purchase5));
-            /*System.out.println(purchase.getId());*/
-            System.out.println(product.getId());
-            Order order=new Order(new OrderId(1L,1L), (Customer) Mohammad,product,15);
-            orderRepo.save(order);
-            Mohammad.addToCart(order);
-           /* Mohammad.addPurchase(purchase);
-            Mohammad.addPurchase(purchase2);*/
-            Followers followers=new Followers(new FollowersId(((Customer) Mohammad).getId(),((Seller) user).getId()), (Customer) Mohammad, (Seller) user);
-            followersRepo.save(followers);
-            Mohammad.follow(followers);
-
-
-            customerRepo.save(Mohammad);
-
-            imageProfilePicRepo.save(imgProfilePicCustomer);
             Prize prize1=new Prize("50$ gift",50);
             Prize prize2=new Prize("100$ gift",80);
             Prize prize3=new Prize("150$ gift",200);
             Prize prize4=new Prize("ticket to Turkey",500);
             prizeRepo.saveAll(List.of(prize1,prize2,prize3,prize4));
-            //PrizeChanger prizeChanger=new PrizeChanger(new PrizeChangerId(prize1.getId(),Mohammad.getId()),prize1, (Customer) Mohammad);
-           // prizeChangerRepo.save(prizeChanger);
-            Like like=new Like(new LikeId(Mohammad.getId(),product.getId()), (Customer) Mohammad,product);
-            likeRepo.save(like);
-            ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");
-            productComment.setCustomer((Customer) Mohammad);
-            productComment.setProduct(product);
-            productCommentRepo.save(productComment);
-            SellerComment sellerComment=new SellerComment("good Seller I advice to buy from him",4.0);
-            sellerComment.setSeller((Seller) user);
-            sellerComment.setCustomer((Customer) Mohammad);
-            sellerCommentRepo.save(sellerComment);
-
-
-
-
-
-
-
-
-
 
 
 

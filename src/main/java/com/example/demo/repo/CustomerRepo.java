@@ -22,5 +22,9 @@ public interface CustomerRepo extends UserRepo {
     boolean existsById(Long id);
     @Query("select (count(u) > 0) from Customer u where u.email = ?1")
     boolean existsByEmail(String email);
+    @Transactional
+    @Modifying
+    @Query("update Customer c set c.points=?1 where c=?2")
+    void updatePoints(Integer points,Customer customer);
 
 }

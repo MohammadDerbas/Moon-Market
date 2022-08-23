@@ -256,13 +256,13 @@ public class MarketConfig {
             customerRepo.save(Mohammad);
 
             imageProfilePicRepo.save(imgProfilePicCustomer);
-            Prize prize1=new Prize("50$ gift",500);
-            Prize prize2=new Prize("100$ gift",800);
-            Prize prize3=new Prize("150$ gift",1200);
-            Prize prize4=new Prize("ticket to Turkey",10000);
+            Prize prize1=new Prize("50$ gift",50);
+            Prize prize2=new Prize("100$ gift",80);
+            Prize prize3=new Prize("150$ gift",200);
+            Prize prize4=new Prize("ticket to Turkey",500);
             prizeRepo.saveAll(List.of(prize1,prize2,prize3,prize4));
-            PrizeChanger prizeChanger=new PrizeChanger(new PrizeChangerId(prize1.getId(),Mohammad.getId()),prize1, (Customer) Mohammad);
-            prizeChangerRepo.save(prizeChanger);
+            //PrizeChanger prizeChanger=new PrizeChanger(new PrizeChangerId(prize1.getId(),Mohammad.getId()),prize1, (Customer) Mohammad);
+           // prizeChangerRepo.save(prizeChanger);
             Like like=new Like(new LikeId(Mohammad.getId(),product.getId()), (Customer) Mohammad,product);
             likeRepo.save(like);
             ProductComment productComment=new ProductComment("Wow , beautiful t-shirt i will come with my friend to buy it");

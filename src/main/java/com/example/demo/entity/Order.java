@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity(name="Cart")
 @Table(name="cart")
@@ -14,6 +15,7 @@ public class Order {
             foreignKey = @ForeignKey(name="order_customer_id_fk"))
 
     private Customer customer;
+
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "product_id",
@@ -22,13 +24,29 @@ public class Order {
     @Column(
             name="date"
     )
-    private LocalDate date;
+    private LocalDate date=LocalDate.now();
     private Integer quantity;
+    private String status="PENDING";
+    private Boolean isDeleted=false;
+    private LocalDate deletedAt;
+    private LocalDate updatedAt;
+    private LocalDate deliverdAt;
+    private String size;
+    private  String color;
+
     private Double price;
 
     public Order() {
     }
 
+    public Order( Product product,Integer quantity,String size,String color,Double price) {
+        this.product = product;
+        this.date = LocalDate.now();
+        this.quantity=quantity;
+        this.price=price;
+        this.color=color;
+
+    }
     public Order(Customer customer, Product product,Integer quantity) {
         this.customer = customer;
         this.product = product;
@@ -74,6 +92,62 @@ public class Order {
         return date;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public LocalDate getDeletedAt() {
+        return deletedAt;
+    }
+
+    public LocalDate getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public LocalDate getDeliverdAt() {
+        return deliverdAt;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public void setDeletedAt(LocalDate deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void setUpdatedAt(LocalDate updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setDeliverdAt(LocalDate deliverdAt) {
+        this.deliverdAt = deliverdAt;
+    }
+
     public void setDate(LocalDate date) {
         this.date = date;
     }
@@ -93,4 +167,23 @@ public class Order {
     public void setPrice(Double price) {
         this.price = price;
     }
+
+
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", customer=" + customer +
+                ", product=" + product +
+                ", quantity=" + quantity +
+                ", status='" + status + '\'' +
+                ", size='" + size + '\'' +
+                ", color='" + color + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }
+
+
+

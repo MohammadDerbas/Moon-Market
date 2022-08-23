@@ -356,12 +356,15 @@ public class SellerServices {
 
 
     private CommentFromDto convertToDTO(SellerComment sellerComment) {
+
         CommentFromDto dto = new CommentFromDto();
         dto.setComment(sellerComment.getComment());
 dto.setRating(sellerComment.getRating());
         dto.setFrom(sellerComment.getCustomer().getFirstName() + " " + sellerComment.getCustomer().getLastName());
         dto.setId(sellerComment.getId());
         dto.setTime(sellerComment.getTime());
+        dto.setImg(sellerComment.getCustomer().getImgProfilePic().getUrl());
+
         return dto;
     }
 

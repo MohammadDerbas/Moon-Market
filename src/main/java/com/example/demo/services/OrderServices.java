@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.DTO.CustomerProductDTO;
+import com.example.demo.DTO.OrderProductDTO;
 import com.example.demo.entity.*;
 import com.example.demo.exception.ApiRequestException;
 import com.example.demo.repo.*;
@@ -9,8 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -119,4 +122,45 @@ public class OrderServices {
     }
 
 
+    public void createOrder(List<OrderProductDTO> orders, String name) {
+
+        boolean exist = customerRepo.existsByEmail(name);
+        if(!exist){
+            throw  new RuntimeException("user doesn t exists");
+        }
+        Customer customer = (Customer) customerRepo.findUserByEmail(name).get();
+        Random rand=new Random();
+
+        List<Order> newOrders=new ArrayList<>();
+        System.out.println("ccccccccc" + customer.getId());
+
+
+        orders.stream().forEach(order ->{
+            System.out.println("zzzzzz" + order.getProductId());
+            Order newOrder=new Order();
+
+            newOrder.setCustomer(customer);
+            Product product =productRepo.findProductById(order.getProductId());
+            newOrder.setId(new OrderId(customer.getId(),product.getId()));
+
+
+            newOrder.setColor(order.getColor());
+            newOrder.setSize(order.getSize());
+            newOrder.setPrice(order.getPrice());
+            newOrder.setQuantity(order.getQuantity());
+            newOrder.setProduct(product);
+            System.out.println("your new order xxxxxx" +  newOrder);
+
+            newOrders.add( newOrder);
+            orderRepo.save(newOrder);
+
+        } );
+        customer.setOrders(newOrders);
+
+        customerRepo.save(customer);
+
+
+
+
+    }
 }

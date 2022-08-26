@@ -46,6 +46,7 @@ public class ForgetPasswordController {
     public void changePassword(@RequestParam("token")String token,@RequestParam("password")String password,@RequestParam("passwordAgain")String passwordAgain){
         forgetPasswordServices.changePassword(token,password,passwordAgain);
     }
+
     @GetMapping(path="/enter_password")
     public void changePassword(@RequestParam("token")String token){
 

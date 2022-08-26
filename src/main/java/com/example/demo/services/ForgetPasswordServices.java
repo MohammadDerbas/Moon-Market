@@ -43,7 +43,7 @@ public class ForgetPasswordServices {
                 user.get()
         );
         confirmationTokenService.saveConfirmationToken(confirmationToken);
-        String link="http://localhost:8080/forget_password/confirm?token="+token;
+        String link="http://localhost:3000/forget_password/confirm?token="+token;
         emailSender.send(email,buildEmail(user.get().getFirstName(),link),"Reset");
 
     }

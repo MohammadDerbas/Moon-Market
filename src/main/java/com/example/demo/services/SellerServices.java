@@ -135,7 +135,9 @@ public class SellerServices {
         userRepo.save(seller);
     }
 
-    public void addNewProduct(Long id,String description,Integer quantity,Double price,String type,String brand,String category,List<String>sizes,List<String>color,List<MultipartFile>file1) throws IOException {
+    public void addNewProduct(String name,String description,Integer quantity,Double price,String type,String brand,String category,List<String>sizes,List<String>color,List<MultipartFile>file1) throws IOException {
+      Long id=sellerRepo.findUserByEmail(name).get().getId();
+
         System.out.println(description+quantity+price+type+brand+category);
         sizes.stream().forEach(s -> System.out.println(s));
         file1.stream().forEach(multipartFile -> System.out.println(multipartFile.getOriginalFilename()));
@@ -705,6 +707,13 @@ updateSellerRating(sellerId);
 
 
     }
+    public List<Product> getSellerProductsById(Long id){
+
+        return productRepo.showProductWithSpecificSeller(id);
+
+
+
+    }
 
     public void addFollow1(Long sellerId, Boolean follow, String name) {
         boolean exists = sellerRepo.existsById(sellerId);
@@ -749,6 +758,14 @@ updateSellerRating(sellerId);
         Seller seller = (Seller) sellerRepo.findUserByEmail(name).get();
 
         List<Long> ids = productRepo.showProductIdsWithSpecificSeller(seller.getId());
+
+        return orderRepo.getSellerOrdersByProductIds(ids).stream().map(this::convertEntityToDto).collect(Collectors.toList());
+
+
+    }
+    public List<CustomerProductDTO> getSellerOrdersBId(Long id) {
+
+        List<Long> ids = productRepo.showProductIdsWithSpecificSeller(id);
 
         return orderRepo.getSellerOrdersByProductIds(ids).stream().map(this::convertEntityToDto).collect(Collectors.toList());
 

@@ -37,7 +37,10 @@ public class RegistrationController {
     }
 
 
+    @PostMapping("/login")
+    public void login(@RequestParam String email,@RequestParam String password){
 
+    }
 
 
 

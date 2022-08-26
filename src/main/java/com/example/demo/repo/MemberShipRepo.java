@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface MemberShipRepo extends JpaRepository<MemberShip,Long> {
-    @Query("select m from MemberShip m where m.type = ?1")
+    @Query("select DISTINCT (m) from MemberShip m where m.type = ?1")
     MemberShip findByType(String type);
 
     @Query("select m.customers from MemberShip m where m.type=?1")
